@@ -3,6 +3,9 @@ package com.ttn.bootcampProject;
 import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.entities.products.Product;
 import com.ttn.bootcampProject.entities.products.categories.Category;
+import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
+import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
+import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
 import com.ttn.bootcampProject.repos.CategoryRepository;
 import com.ttn.bootcampProject.repos.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,8 @@ class BootcampProjectApplicationTests {
 	PasswordEncoder passwordEncoder;
 	@Autowired
 	CategoryRepository categoryRepository;
+	@Autowired
+	CategoryMetadataFieldRepository categoryMetadataFieldRepository;
 
 	@Test
 	void contextLoads() {
@@ -92,6 +97,7 @@ class BootcampProjectApplicationTests {
 		customer.setPassword(pass);
 		customer.setContact("3525761182");
 
+
 		userRepository.save(customer);
 	}
 
@@ -154,11 +160,30 @@ class BootcampProjectApplicationTests {
 	{
 		Category category = new Category();
 		category.setName("Fashion");
+		Category shirt = new Category("shirt");
+		Category shoes = new Category("shoes");
+
+		Set<Category> shirts = new HashSet<>();
+		shirts.add(new Category("Casual"));
+		shirts.add(new Category("Formal"));
+		shirt.setCategorySet(shirts);
+
+		Set<Category> shoesSet = new HashSet<>();
+		shoesSet.add(new Category("sneakers"));
+		shoesSet.add(new Category("sports"));
+		shoes.setCategorySet(shoesSet);
+
 		Set<Category> categories = new HashSet<>();
-		categories.add(new Category("shirt"));
-		categories.add(new Category("shoes"));
+		categories.add(shirt);
+		categories.add(shoes);
 		category.setCategorySet(categories);
 
 		categoryRepository.save(category);
+	}
+
+	@Test
+	public void testCategoryMetadataFieldValuesTable()
+	{
+
 	}
 }
