@@ -1,18 +1,18 @@
 package com.ttn.bootcampProject;
 
 import com.ttn.bootcampProject.entities.*;
+import com.ttn.bootcampProject.entities.orders.Orders;
 import com.ttn.bootcampProject.entities.products.Product;
 import com.ttn.bootcampProject.entities.products.categories.Category;
-import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
 import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
 import com.ttn.bootcampProject.repos.CategoryRepository;
+import com.ttn.bootcampProject.repos.OrderRepository;
 import com.ttn.bootcampProject.repos.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +28,8 @@ class BootcampProjectApplicationTests {
 	CategoryRepository categoryRepository;
 	@Autowired
 	CategoryMetadataFieldRepository categoryMetadataFieldRepository;
+	@Autowired
+	OrderRepository orderRepository;
 
 	@Test
 	void contextLoads() {
@@ -126,19 +128,18 @@ class BootcampProjectApplicationTests {
 	@Test
 	public void testAddSellerAndProducts()
 	{
-		User user = new User();
-		user.setEmail("gsayg@gmail.com");
-		user.setFirstName("Vardan");
-		user.setLastName("Balyan");
-		user.setPassword("12345");
-		user.setActive(true);
-		user.setDeleted(false);
 
 		Seller seller = new Seller();
-		seller.setGst("231435346556414");
-		seller.setCompanyContact("99522532");
-		seller.setCompanyName("punjabi cloth house");
-		//seller.setUser(user);
+		seller.setFirstName("Parth");
+		seller.setLastName("Choudhary");
+		seller.setActive(true);
+		seller.setDeleted(false);
+		String pass = passwordEncoder.encode("12345");
+		seller.setPassword(pass);
+		seller.setMiddleName("Pawar");
+		seller.setCompanyName("fgdgs");
+		seller.setGst("2564356652");
+		seller.setCompanyContact("35424141");
 
 		Product product = new Product();
 		product.setActive(true);
@@ -151,8 +152,7 @@ class BootcampProjectApplicationTests {
 		seller.addProducts(product);
 
 		//user.setSeller(seller);
-		userRepository.save(user);
-
+		userRepository.save(seller);
 	}
 
 	@Test
@@ -184,6 +184,61 @@ class BootcampProjectApplicationTests {
 	@Test
 	public void testCategoryMetadataFieldValuesTable()
 	{
+		Category category = new Category();
+		category.setName("Fashion");
+		Category shirt = new Category("shirt");
+		Category shoes = new Category("shoes");
+
+		Set<Category> shirts = new HashSet<>();
+		shirts.add(new Category("Casual"));
+		shirts.add(new Category("Formal"));
+		shirt.setCategorySet(shirts);
+
+		Set<Category> shoesSet = new HashSet<>();
+		shoesSet.add(new Category("sneakers"));
+		shoesSet.add(new Category("sports"));
+		shoes.setCategorySet(shoesSet);
+
+		Set<Category> categories = new HashSet<>();
+		categories.add(shirt);
+		categories.add(shoes);
+		category.setCategorySet(categories);
+
+		CategoryMetadataFieldValues cm = new CategoryMetadataFieldValues();
+		cm.setValue("tasjhag");
+
+		shirt.addCategoryMetadataFieldValues(cm);
+
+		categoryRepository.save(category);
+	}
+
+	@Test
+	public void testAddOrder()
+	{
+		Customer customer = new Customer();
+		customer.setFirstName("Arun");
+		customer.setLastName("Pawar");
+		customer.setMiddleName("Singh");
+		customer.setEmail("Arun@gmail.com");
+		customer.setActive(false);
+		customer.setDeleted(true);
+		String pass = passwordEncoder.encode("12345");
+		customer.setPassword(pass);
+		customer.setContact("3525761182");
+
+		Orders orders = new Orders();
+		orders.setAmountPaid(53.4);
+		orders.setCustomerAddressAddressLine("ghjsaj");
+		orders.setCustomerAddressCity("New Delhi");
+		orders.setCustomerAddressLabel("home");
+		orders.setCustomerAddressState("Delhi");
+		orders.setCustomerAddressZipCode("671");
+		orders.setPaymentMethod("cod");
+		orders.setCustomerAddressCountry("india");
+
+		//orderRepository.save(orders);
+		customer.addOrders(orders);
+		userRepository.save(customer);
 
 	}
 }

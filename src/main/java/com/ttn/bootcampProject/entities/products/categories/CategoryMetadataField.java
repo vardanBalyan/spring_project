@@ -16,8 +16,8 @@ public class CategoryMetadataField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_metadata_filed_id")
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 
     public void addCategoryMetadataFieldValues(CategoryMetadataFieldValues value)
@@ -29,6 +29,8 @@ public class CategoryMetadataField {
                 categoryMetadataFieldValues = new HashSet<>();
             }
             categoryMetadataFieldValues.add(value);
+            //this.setCategoryMetadataFieldValues(categoryMetadataFieldValues);
+            value.setCategoryMetadataField(this);
         }
     }
 

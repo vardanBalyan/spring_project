@@ -20,8 +20,7 @@ public class Category {
     @JoinColumn(name = "parent_category_id")
     private Set<Category> categorySet;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 
     public void addCategoryMetadataFieldValues(CategoryMetadataFieldValues value)
@@ -33,6 +32,8 @@ public class Category {
                 categoryMetadataFieldValues = new HashSet<>();
             }
             categoryMetadataFieldValues.add(value);
+            //this.setCategoryMetadataFieldValues(categoryMetadataFieldValues);
+            value.setCategory(this);
         }
     }
 

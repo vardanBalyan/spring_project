@@ -1,19 +1,31 @@
 package com.ttn.bootcampProject.entities.products.categories;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryMetadataFieldValuesId implements Serializable {
 
     private int categoryId;
     private int categoryMetadataFieldId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CategoryMetadataFieldValuesId that = (CategoryMetadataFieldValuesId) o;
+        return categoryId == that.categoryId && categoryMetadataFieldId == that.categoryMetadataFieldId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(categoryId, categoryMetadataFieldId);
+    }
 }
