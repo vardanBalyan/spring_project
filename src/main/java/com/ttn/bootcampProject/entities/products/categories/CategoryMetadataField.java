@@ -13,8 +13,8 @@ import java.util.Set;
 public class CategoryMetadataField {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
     private String name;
 
     @OneToMany(mappedBy = "categoryMetadataField")

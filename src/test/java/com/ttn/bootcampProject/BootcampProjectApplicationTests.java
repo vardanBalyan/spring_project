@@ -3,12 +3,10 @@ package com.ttn.bootcampProject;
 import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.entities.orders.Orders;
 import com.ttn.bootcampProject.entities.products.Product;
+import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
-import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
-import com.ttn.bootcampProject.repos.CategoryRepository;
-import com.ttn.bootcampProject.repos.OrderRepository;
-import com.ttn.bootcampProject.repos.UserRepository;
+import com.ttn.bootcampProject.repos.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +28,8 @@ class BootcampProjectApplicationTests {
 	CategoryMetadataFieldRepository categoryMetadataFieldRepository;
 	@Autowired
 	OrderRepository orderRepository;
+	@Autowired
+	ProductVariationRepository productVariationRepository;
 
 	@Test
 	void contextLoads() {
@@ -275,5 +275,17 @@ class BootcampProjectApplicationTests {
 
 		shirt.addProducts(product);
 		categoryRepository.save(category);
+	}
+
+	@Test
+	public void testProductVariation()
+	{
+		ProductVariation p = new ProductVariation();
+		p.setActive(false);
+		p.setPrice(5632.4);
+		p.setPrimaryImageName("hello");
+		p.setQuantityAvailable(7);
+		p.setMetadata("{ \"color\" : \"black\", \"type\" : \"sports\" }");
+		productVariationRepository.save(p);
 	}
 }

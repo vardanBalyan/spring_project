@@ -14,8 +14,8 @@ import javax.persistence.Id;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
     private String city;
     private String state;
     private String country;

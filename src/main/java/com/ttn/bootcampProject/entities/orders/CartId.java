@@ -1,4 +1,4 @@
-package com.ttn.bootcampProject.entities.products;
+package com.ttn.bootcampProject.entities.orders;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,21 +12,21 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductReviewId implements Serializable {
+public class CartId implements Serializable {
 
     private long customerUserId;
-    private long productId;
+    private long productVariationId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProductReviewId that = (ProductReviewId) o;
-        return customerUserId == that.customerUserId && productId == that.productId;
+        CartId cartId = (CartId) o;
+        return customerUserId == cartId.customerUserId && productVariationId == cartId.productVariationId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customerUserId, productId);
+        return Objects.hash(customerUserId, productVariationId);
     }
 }

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,7 +15,7 @@ import java.util.Date;
 public class Orders {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
     private Double amountPaid;
@@ -25,4 +27,20 @@ public class Orders {
     private String customerAddressAddressLine;
     private String customerAddressZipCode;
     private String customerAddressLabel;
+
+    @OneToMany
+    @JoinColumn(name = "order_id")
+    private List<OrderProduct> orderProductList;
+
+    public void addOrderProduct(OrderProduct orderProduct)
+    {
+        if(orderProduct!=null)
+        {
+            if(orderProductList == null)
+            {
+                orderProductList = new ArrayList<>();
+            }
+            orderProductList.add(orderProduct);
+        }
+    }
 }

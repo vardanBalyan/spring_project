@@ -13,8 +13,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class CategoryMetadataFieldValuesId implements Serializable {
 
-    private int categoryId;
-    private int categoryMetadataFieldId;
+    private long categoryId;
+    private long categoryMetadataFieldId;
 
     @Override
     public boolean equals(Object o) {

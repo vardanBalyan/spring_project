@@ -12,8 +12,8 @@ import java.util.List;
 @Setter
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
     private String name;
     private String description;
     private boolean isCancellable;
@@ -24,7 +24,7 @@ public class Product {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
     private List<ProductReview> productReviews;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
     private List<ProductVariation> productVariationList;
 
