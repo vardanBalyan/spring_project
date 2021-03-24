@@ -23,8 +23,7 @@ public class Customer extends User{
     @JoinColumn(name = "customer_customer_user_id")
     private Set<Orders> ordersSet;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_user_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<ProductReview> productReviews;
 
     public void addOrders(Orders orders)

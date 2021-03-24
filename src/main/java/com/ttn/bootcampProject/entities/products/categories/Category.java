@@ -1,10 +1,13 @@
 package com.ttn.bootcampProject.entities.products.categories;
 
+import com.ttn.bootcampProject.entities.products.Product;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,12 +19,17 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_category_id")
     private Set<Category> categorySet;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
+    private List<Product> productList;
+
+    @OneToMany(mappedBy = "category")
+    Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 
     public void addCategoryMetadataFieldValues(CategoryMetadataFieldValues value)
     {
@@ -34,6 +42,18 @@ public class Category {
             categoryMetadataFieldValues.add(value);
             //this.setCategoryMetadataFieldValues(categoryMetadataFieldValues);
             value.setCategory(this);
+        }
+    }
+
+    public void addProducts(Product product)
+    {
+        if(product!=null)
+        {
+            if(productList==null)
+            {
+                productList = new ArrayList<>();
+            }
+            productList.add(product);
         }
     }
 

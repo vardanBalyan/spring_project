@@ -20,11 +20,11 @@ public class CategoryMetadataFieldValues {
     @ManyToOne
     @MapsId("categoryId")
     @JoinColumn(name = "category_id")
-    private Category category;
+    Category category;
 
 
     @ManyToOne
     @MapsId("categoryMetadataFieldId")
     @JoinColumn(name = "category_metadata_field_id")
-    private CategoryMetadataField categoryMetadataField;
+    CategoryMetadataField categoryMetadataField;
 }

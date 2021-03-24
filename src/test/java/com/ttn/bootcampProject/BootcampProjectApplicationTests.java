@@ -241,4 +241,39 @@ class BootcampProjectApplicationTests {
 		userRepository.save(customer);
 
 	}
+
+	@Test
+	public void testCategoryProduct()
+	{
+		Category category = new Category();
+		category.setName("Fashion");
+		Category shirt = new Category("shirt");
+		Category shoes = new Category("shoes");
+
+		Set<Category> shirts = new HashSet<>();
+		shirts.add(new Category("Casual"));
+		shirts.add(new Category("Formal"));
+		shirt.setCategorySet(shirts);
+
+		Set<Category> shoesSet = new HashSet<>();
+		shoesSet.add(new Category("sneakers"));
+		shoesSet.add(new Category("sports"));
+		shoes.setCategorySet(shoesSet);
+
+		Set<Category> categories = new HashSet<>();
+		categories.add(shirt);
+		categories.add(shoes);
+		category.setCategorySet(categories);
+
+		Product product = new Product();
+		product.setReturnable(false);
+		product.setDescription("hjdshhj");
+		product.setName("hdkj");
+		product.setCancellable(false);
+		product.setBrand("wrong");
+		product.setActive(true);
+
+		shirt.addProducts(product);
+		categoryRepository.save(category);
+	}
 }

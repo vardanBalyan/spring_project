@@ -17,8 +17,8 @@ public class CategoryMetadataField {
     private int id;
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
+    @OneToMany(mappedBy = "categoryMetadataField")
+    Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 
     public void addCategoryMetadataFieldValues(CategoryMetadataFieldValues value)
     {
