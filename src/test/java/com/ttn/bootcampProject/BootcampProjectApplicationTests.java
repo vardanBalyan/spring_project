@@ -3,6 +3,7 @@ package com.ttn.bootcampProject;
 import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.entities.orders.Orders;
 import com.ttn.bootcampProject.entities.products.Product;
+import com.ttn.bootcampProject.entities.products.ProductReview;
 import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
@@ -30,6 +31,8 @@ class BootcampProjectApplicationTests {
 	OrderRepository orderRepository;
 	@Autowired
 	ProductVariationRepository productVariationRepository;
+	@Autowired
+	ProductRepository productRepository;
 
 	@Test
 	void contextLoads() {
@@ -287,5 +290,36 @@ class BootcampProjectApplicationTests {
 		p.setQuantityAvailable(7);
 		p.setMetadata("{ \"color\" : \"black\", \"type\" : \"sports\" }");
 		productVariationRepository.save(p);
+	}
+
+	@Test
+	public void testProductReview()
+	{
+		Customer customer = new Customer();
+		customer.setFirstName("Arun");
+		customer.setLastName("Pawar");
+		customer.setMiddleName("Singh");
+		customer.setEmail("Arun@gmail.com");
+		customer.setActive(false);
+		customer.setDeleted(true);
+		String pass = passwordEncoder.encode("12345");
+		customer.setPassword(pass);
+		customer.setContact("3525761182");
+
+		Product product = new Product();
+		product.setActive(true);
+		product.setBrand("OnePlus");
+		product.setCancellable(true);
+		product.setDescription("One plus 8T");
+		product.setName("OnePlus mobile");
+		product.setReturnable(false);
+
+		//user.setSeller(seller);
+
+		ProductReview review = new ProductReview(product,customer,"great","5");
+		customer.addReviews(review);
+
+		userRepository.save(customer);
+		productRepository.save(product);
 	}
 }

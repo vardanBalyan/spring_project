@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class ProductReview {
 
     @EmbeddedId
-    private ProductReviewId id;
+    private ProductReviewId id = new ProductReviewId();
 
     @ManyToOne
     @MapsId("productId")
@@ -26,4 +26,14 @@ public class ProductReview {
 
     private String review;
     private String rating;
+
+    public ProductReview(Product product, Customer customer, String review, String rating) {
+        this.product = product;
+        this.customer = customer;
+        this.review = review;
+        this.rating = rating;
+    }
+
+    public ProductReview() {
+    }
 }
