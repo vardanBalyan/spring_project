@@ -123,8 +123,8 @@ class BootcampProjectApplicationTests {
 		Role role2 = new Role();
 		role2.setAuthority("USER");
 
-		user.addRoles(role);
-		user.addRoles(role2);
+		//user.addRoles(role);
+		//user.addRoles(role2);
 		userRepository.save(user);
 	}
 

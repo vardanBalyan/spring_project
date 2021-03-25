@@ -30,18 +30,15 @@ public class User {
     @JoinColumn(name = "user_id")
     private Set<Address> addresses;
 
-   @OneToMany(cascade = CascadeType.ALL)
-   @JoinTable(name = "user_role",
-   joinColumns = @JoinColumn(name = "user_id"),
-   inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<UserRole> userRoles;
 
-   public void addRoles(Role role) {
-       if (role != null) {
-           if (roles == null) {
-               roles = new HashSet<>();
+   public void addRoles(UserRole userRole) {
+       if (userRole != null) {
+           if (userRoles == null) {
+               userRoles = new HashSet<>();
            }
-           roles.add(role);
+           userRoles.add(userRole);
        }
    }
 

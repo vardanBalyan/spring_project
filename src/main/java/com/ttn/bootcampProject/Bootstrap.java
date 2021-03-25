@@ -50,8 +50,8 @@ public class Bootstrap implements ApplicationRunner {
             admin.setActive(true);
 
             Set<Role> rolesOfAdmin = new HashSet<>();
-            rolesOfAdmin.add(adminRole);
-            admin.setRoles(rolesOfAdmin);
+            //rolesOfAdmin.add(adminRole);
+            //admin.setRoles(rolesOfAdmin);
 
             Customer customer = new Customer();
             customer.setFirstName("Vardan");
@@ -75,8 +75,8 @@ public class Bootstrap implements ApplicationRunner {
             customer.setAddresses(addresses);
 
             Set<Role> rolesOfCustomer = new HashSet<>();
-            rolesOfCustomer.add(customerRole);
-            customer.setRoles(rolesOfCustomer);
+            //rolesOfCustomer.add(customerRole);
+            //customer.setRoles(rolesOfCustomer);
 
             userRepository.save(customer);
             userRepository.save(admin);

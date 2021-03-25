@@ -3,10 +3,9 @@ package com.ttn.bootcampProject.entities;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -17,5 +16,15 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     private String authority;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private Set<UserRole> userRoles;
 
+    public void addRoles(UserRole userRole) {
+        if (userRole != null) {
+            if (userRoles == null) {
+                userRoles = new HashSet<>();
+            }
+            userRoles.add(userRole);
+        }
+    }
 }
