@@ -17,4 +17,5 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     private String authority;
+
 }
