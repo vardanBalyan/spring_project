@@ -1,4 +1,4 @@
-package com.ttn.bootcampProject;
+package com.ttn.bootcampProject.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

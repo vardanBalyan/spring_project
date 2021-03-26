@@ -1,5 +1,6 @@
-package com.ttn.bootcampProject;
+package com.ttn.bootcampProject.config;
 
+import com.ttn.bootcampProject.services.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

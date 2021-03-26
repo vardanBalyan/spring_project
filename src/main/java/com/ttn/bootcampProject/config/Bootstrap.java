@@ -1,10 +1,7 @@
-package com.ttn.bootcampProject;
+package com.ttn.bootcampProject.config;
 
 
-import com.ttn.bootcampProject.entities.Address;
-import com.ttn.bootcampProject.entities.Admin;
-import com.ttn.bootcampProject.entities.Customer;
-import com.ttn.bootcampProject.entities.Role;
+import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.repos.RoleRepository;
 import com.ttn.bootcampProject.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +32,6 @@ public class Bootstrap implements ApplicationRunner {
         Role customerRole = new Role();
         customerRole.setAuthority("ROLE_CUSTOMER");
 
-        roleRepository.save(adminRole);
-        roleRepository.save(sellerRole);
-        roleRepository.save(customerRole);
-
         if(userRepository.count()<1){
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -48,10 +41,10 @@ public class Bootstrap implements ApplicationRunner {
             admin.setEmail("admin");
             admin.setPassword(passwordEncoder.encode("pass"));
             admin.setActive(true);
+            admin.setContact("4666762");
 
-            Set<Role> rolesOfAdmin = new HashSet<>();
-            //rolesOfAdmin.add(adminRole);
-            //admin.setRoles(rolesOfAdmin);
+            UserRole roleOfAdmin = new UserRole(admin,adminRole);
+            admin.addRoles(roleOfAdmin);
 
             Customer customer = new Customer();
             customer.setFirstName("Vardan");
@@ -74,13 +67,15 @@ public class Bootstrap implements ApplicationRunner {
             addresses.add(address);
             customer.setAddresses(addresses);
 
-            Set<Role> rolesOfCustomer = new HashSet<>();
-            //rolesOfCustomer.add(customerRole);
-            //customer.setRoles(rolesOfCustomer);
+            UserRole roleOfCustomer = new UserRole(customer, customerRole);
+            customer.addRoles(roleOfCustomer);
 
             userRepository.save(customer);
             userRepository.save(admin);
             System.out.println("Total users saved::"+userRepository.count());
         }
+        roleRepository.save(adminRole);
+        roleRepository.save(sellerRole);
+        roleRepository.save(customerRole);
     }
 }

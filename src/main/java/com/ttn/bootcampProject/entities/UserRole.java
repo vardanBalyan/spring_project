@@ -1,6 +1,8 @@
 package com.ttn.bootcampProject.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -22,4 +24,12 @@ public class UserRole {
     @MapsId("roleId")
     @JoinColumn(name = "role_id")
     private Role role;
+
+    public UserRole() {
+    }
+
+    public UserRole(User user, Role role) {
+        this.user = user;
+        this.role = role;
+    }
 }

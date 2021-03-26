@@ -16,7 +16,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     private String authority;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    @OneToMany(mappedBy = "role")
     private Set<UserRole> userRoles;
 
     public void addRoles(UserRole userRole) {

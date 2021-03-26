@@ -39,6 +39,7 @@ public class User {
                userRoles = new HashSet<>();
            }
            userRoles.add(userRole);
+           userRole.setUser(this);
        }
    }
 

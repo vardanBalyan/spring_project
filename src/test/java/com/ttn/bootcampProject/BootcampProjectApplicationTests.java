@@ -38,7 +38,7 @@ class BootcampProjectApplicationTests {
 	void contextLoads() {
 	}
 
-	@Test
+	//@Test
 	public void testCreateUserAndAddAddress()
 	{
 		User user = new User();
@@ -70,7 +70,7 @@ class BootcampProjectApplicationTests {
 		userRepository.save(user);
 	}
 
-	@Test
+	//@Test
 	public void testCreateUserAndSeller()
 	{
 		Seller seller = new Seller();
@@ -88,7 +88,7 @@ class BootcampProjectApplicationTests {
 		userRepository.save(seller);
 	}
 
-	@Test
+	//@Test
 	public void testCreateUserAndCustomer()
 	{
 		Customer customer = new Customer();
@@ -106,7 +106,7 @@ class BootcampProjectApplicationTests {
 		userRepository.save(customer);
 	}
 
-	@Test
+	//@Test
 	public void testCreateUserAndRole()
 	{
 		User user = new User();
@@ -128,7 +128,7 @@ class BootcampProjectApplicationTests {
 		userRepository.save(user);
 	}
 
-	@Test
+	//@Test
 	public void testAddSellerAndProducts()
 	{
 
@@ -158,7 +158,7 @@ class BootcampProjectApplicationTests {
 		userRepository.save(seller);
 	}
 
-	@Test
+	//@Test
 	public void testCategory()
 	{
 		Category category = new Category();
@@ -184,7 +184,7 @@ class BootcampProjectApplicationTests {
 		categoryRepository.save(category);
 	}
 
-	@Test
+	//@Test
 	public void testCategoryMetadataFieldValuesTable()
 	{
 		Category category = new Category();
@@ -215,7 +215,7 @@ class BootcampProjectApplicationTests {
 		categoryRepository.save(category);
 	}
 
-	@Test
+	//@Test
 	public void testAddOrder()
 	{
 		Customer customer = new Customer();
@@ -245,7 +245,7 @@ class BootcampProjectApplicationTests {
 
 	}
 
-	@Test
+	//@Test
 	public void testCategoryProduct()
 	{
 		Category category = new Category();
@@ -280,7 +280,7 @@ class BootcampProjectApplicationTests {
 		categoryRepository.save(category);
 	}
 
-	@Test
+	//@Test
 	public void testProductVariation()
 	{
 		ProductVariation p = new ProductVariation();
@@ -292,7 +292,7 @@ class BootcampProjectApplicationTests {
 		productVariationRepository.save(p);
 	}
 
-	@Test
+	//@Test
 	public void testProductReview()
 	{
 		Customer customer = new Customer();

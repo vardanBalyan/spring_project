@@ -1,4 +1,4 @@
-package com.ttn.bootcampProject;
+package com.ttn.bootcampProject.config;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

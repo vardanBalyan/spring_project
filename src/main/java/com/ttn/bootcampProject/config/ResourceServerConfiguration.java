@@ -1,4 +1,4 @@
-package com.ttn.bootcampProject;
+package com.ttn.bootcampProject.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +52,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/").anonymous()
                 .antMatchers("/admin/home").hasAnyRole("ADMIN")
-                .antMatchers("/user/home").hasAnyRole("USER")
-                .antMatchers("/doLogout").hasAnyRole("ADMIN","USER")
+                .antMatchers("/user/home").hasAnyRole("CUSTOMER")
+                .antMatchers("/doLogout").hasAnyRole("ADMIN","CUSTOMER")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
