@@ -4,6 +4,7 @@ import com.ttn.bootcampProject.config.AppUser;
 import com.ttn.bootcampProject.config.GrantAuthorityImpl;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.UserRole;
+import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.repos.RoleRepository;
 import com.ttn.bootcampProject.repos.UserRepository;
 import com.ttn.bootcampProject.repos.UserRoleRepository;
@@ -53,5 +54,17 @@ public class UserDao {
             throw new RuntimeException();
         }
 
+    }
+
+    public boolean isCustomerActive(String email)
+    {
+        User user = userRepository.findByEmail(email);
+
+        if(user == null)
+            throw new UserNotFoundException("no user found for the specified email");
+        else
+        {
+            return user.isActive();
+        }
     }
 }

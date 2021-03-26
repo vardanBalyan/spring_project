@@ -39,7 +39,7 @@ public class Bootstrap implements ApplicationRunner {
             admin.setFirstName("admin");
             admin.setDeleted(false);
             admin.setEmail("admin");
-            admin.setPassword(passwordEncoder.encode("pass"));
+            admin.setPassword(passwordEncoder.encode("admin"));
             admin.setActive(true);
             admin.setContact("4666762");
 
@@ -53,7 +53,7 @@ public class Bootstrap implements ApplicationRunner {
             customer.setDeleted(false);
             customer.setEmail("vardanbalyan@gmail.com");
             customer.setPassword(passwordEncoder.encode("pass"));
-            customer.setActive(true);
+            customer.setActive(false);
 
             Address address = new Address();
             address.setZipCode("110099");
