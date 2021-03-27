@@ -1,6 +1,7 @@
 package com.ttn.bootcampProject.resources;
 
 import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
+import com.ttn.bootcampProject.helpingclasses.SellersInfo;
 import com.ttn.bootcampProject.services.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,5 +20,11 @@ public class AdminResource {
     public List<CustomerInfo> listAllCustomers()
     {
         return userService.getAllCustomers();
+    }
+
+    @GetMapping(path = "/admin/sellers")
+    public List<SellersInfo> listAllSellers()
+    {
+        return userService.getAllSellers();
     }
 }

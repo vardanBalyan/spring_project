@@ -2,14 +2,14 @@ package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.config.AppUser;
 import com.ttn.bootcampProject.config.GrantAuthorityImpl;
+import com.ttn.bootcampProject.entities.Address;
+import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.UserRole;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
-import com.ttn.bootcampProject.repos.CustomerRepository;
-import com.ttn.bootcampProject.repos.RoleRepository;
-import com.ttn.bootcampProject.repos.UserRepository;
-import com.ttn.bootcampProject.repos.UserRoleRepository;
+import com.ttn.bootcampProject.helpingclasses.SellersInfo;
+import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +28,10 @@ public class UserDao {
     RoleRepository roleRepository;
     @Autowired
     CustomerRepository customerRepository;
+    @Autowired
+    SellerRepository sellerRepository;
+    @Autowired
+    AddressRepository addressRepository;
 
     public AppUser loadUserByUsername(String email) {
         User user = userRepository.findByEmail(email);
@@ -100,5 +104,27 @@ public class UserDao {
         }
 
         return customerInfoList;
+    }
+
+    public List<SellersInfo> getAllSellers()
+    {
+        List<Long> ids = sellerRepository.fetchAllIdsOfSellers();
+        List<SellersInfo> sellersInfoList = new ArrayList<>();
+        List<Address> addresses;
+
+        for (Long id: ids) {
+            User user = userRepository.findByUserId(id);
+            addresses = addressRepository.findByAddressId(id);
+            Seller seller = sellerRepository.findSellerById(id);
+
+            sellersInfoList.add(new SellersInfo(
+                    user.getId(),
+                    (user.getFirstName()+" "+user.getMiddleName()+" "+user.getLastName()),
+                    user.getEmail(),
+                    user.isActive(),seller.getCompanyName(),
+                    seller.getCompanyContact(), addresses));
+        }
+
+        return sellersInfoList;
     }
 }
