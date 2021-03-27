@@ -39,4 +39,16 @@ public class AdminResource {
     {
         return userService.deactivateSeller(id);
     }
+
+    @PatchMapping(path = "/customer/activate/{id}")
+    public String activateCustomer(@PathVariable long id)
+    {
+        return userService.activateCustomer(id);
+    }
+
+    @PatchMapping(path = "/customer/deactivate/{id}")
+    public String deactivateCustomer(@PathVariable long id)
+    {
+        return userService.deactivateCustomer(id);
+    }
 }

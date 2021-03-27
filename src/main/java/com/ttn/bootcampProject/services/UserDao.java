@@ -2,10 +2,7 @@ package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.config.AppUser;
 import com.ttn.bootcampProject.config.GrantAuthorityImpl;
-import com.ttn.bootcampProject.entities.Address;
-import com.ttn.bootcampProject.entities.Seller;
-import com.ttn.bootcampProject.entities.User;
-import com.ttn.bootcampProject.entities.UserRole;
+import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
 import com.ttn.bootcampProject.helpingclasses.SellersInfo;
@@ -138,16 +135,16 @@ public class UserDao {
         else
         {
             if(seller == null)
-                return "The provided user id is not seller";
+                return "The provided user id is not seller.";
         }
 
         if(!user.isActive())
         {
             user.setActive(true);
             userRepository.save(user);
-            return "Seller is now active";
+            return "Seller is now active.";
         }
-        return "Seller is already active";
+        return "Seller is already active.";
     }
 
 
@@ -161,38 +158,60 @@ public class UserDao {
         else
         {
             if(seller == null)
-                return "The provided user id is not seller";
+                return "The provided user id is not seller.";
         }
 
         if(user.isActive())
         {
             user.setActive(false);
             userRepository.save(user);
-            return "Seller is now de-active";
+            return "Seller is now de-active.";
         }
-        return "Seller is already deactivated";
+        return "Seller is already deactivated.";
     }
 
-    /*
+
     public String activateCustomer(long id)
     {
         User user = userRepository.findByUserId(id);
-        Seller seller = sellerRepository.findSellerById(id);
+        Customer customer = customerRepository.findCustomerById(id);
 
         if(user == null)
             return "No user exist with the provided id.";
         else
         {
-            if(seller == null)
-                return "The provided user id is not seller";
+            if(customer == null)
+                return "The provided user id is not customer.";
         }
 
         if(!user.isActive())
         {
             user.setActive(true);
             userRepository.save(user);
-            return "Seller is now active";
+            return "Customer is now active.";
         }
-        return "Seller is already active";
-    }*/
+        return "Customer is already active.";
+    }
+
+    public String deactivateCustomer(long id)
+    {
+        User user = userRepository.findByUserId(id);
+        Customer customer = customerRepository.findCustomerById(id);
+
+        if(user == null)
+            return "No user exist with the provided id.";
+        else
+        {
+            if(customer == null)
+                return "The provided user id is not customer.";
+        }
+
+        if(user.isActive())
+        {
+            user.setActive(false);
+            userRepository.save(user);
+            return "Customer is now de-active.";
+        }
+        return "Customer is already deactivated.";
+    }
 }
