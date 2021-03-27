@@ -1,8 +1,9 @@
 package com.ttn.bootcampProject.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GeneratorType;
+
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ public class User {
     private String firstName;
     private String middleName;
     private String lastName;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private boolean isDeleted;
     private boolean isActive;

@@ -7,9 +7,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, Integer> {
+public interface UserRepository extends CrudRepository<User, Long> {
    public User findByEmail(String email);
 
-   @Query("select u.isActive from User u where u.email=:enteredEmail")
-   public boolean isUserActive(@Param("enteredEmail") String email);
+   @Query("from User where id=:id")
+   public User findByUserId(@Param("id") long id);
 }

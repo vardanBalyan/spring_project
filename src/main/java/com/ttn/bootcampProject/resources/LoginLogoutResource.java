@@ -1,7 +1,6 @@
 package com.ttn.bootcampProject.resources;
 
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
-import com.ttn.bootcampProject.repos.UserRepository;
 import com.ttn.bootcampProject.services.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class LoginLogout {
+public class LoginLogoutResource {
 
     @Autowired
     private TokenStore tokenStore;
@@ -31,20 +30,29 @@ public class LoginLogout {
     @GetMapping("/customer/home/{email}")
     public String customerHome(@PathVariable String email)
     {
-        if(userService.isCustomerActive(email))
-            return "Customer home";
-        else
-            return "not activated";
-            //throw new UserNotFoundException("user is not activated");
+        if(!userService.checkUserIsDeleted(email))
+        {
+            if(userService.checkUserIsActive(email))
+            {
+                return "Customer home";
+            }
+            return "User is not active";
+        }
+        return "User doesn't exist";
     }
 
     @GetMapping("/seller/home/{email}")
     public String sellerHome(@PathVariable String email)
     {
-        if(userService.isCustomerActive(email))
-            return "Seller home";
-        else
-            throw new UserNotFoundException("user is not activated");
+        if(!userService.checkUserIsDeleted(email))
+        {
+            if(userService.checkUserIsActive(email))
+            {
+                return "Customer home";
+            }
+            return "User is not active";
+        }
+        return "User doesn't exist";
     }
 
     @GetMapping("/doLogout")
