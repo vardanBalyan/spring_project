@@ -127,4 +127,72 @@ public class UserDao {
 
         return sellersInfoList;
     }
+
+    public String activateSeller(long id)
+    {
+        User user = userRepository.findByUserId(id);
+        Seller seller = sellerRepository.findSellerById(id);
+
+        if(user == null)
+            return "No user exist with the provided id.";
+        else
+        {
+            if(seller == null)
+                return "The provided user id is not seller";
+        }
+
+        if(!user.isActive())
+        {
+            user.setActive(true);
+            userRepository.save(user);
+            return "Seller is now active";
+        }
+        return "Seller is already active";
+    }
+
+
+    public String deactivateSeller(long id)
+    {
+        User user = userRepository.findByUserId(id);
+        Seller seller = sellerRepository.findSellerById(id);
+
+        if(user == null)
+            return "No user exist with the provided id.";
+        else
+        {
+            if(seller == null)
+                return "The provided user id is not seller";
+        }
+
+        if(user.isActive())
+        {
+            user.setActive(false);
+            userRepository.save(user);
+            return "Seller is now de-active";
+        }
+        return "Seller is already deactivated";
+    }
+
+    /*
+    public String activateCustomer(long id)
+    {
+        User user = userRepository.findByUserId(id);
+        Seller seller = sellerRepository.findSellerById(id);
+
+        if(user == null)
+            return "No user exist with the provided id.";
+        else
+        {
+            if(seller == null)
+                return "The provided user id is not seller";
+        }
+
+        if(!user.isActive())
+        {
+            user.setActive(true);
+            userRepository.save(user);
+            return "Seller is now active";
+        }
+        return "Seller is already active";
+    }*/
 }

@@ -1,30 +1,42 @@
 package com.ttn.bootcampProject.resources;
 
+import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
 import com.ttn.bootcampProject.helpingclasses.SellersInfo;
 import com.ttn.bootcampProject.services.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping(path = "/admin")
 public class AdminResource {
 
     @Autowired
     UserDao userService;
 
-    @GetMapping(path = "/admin/customers")
+    @GetMapping(path = "/customers")
     public List<CustomerInfo> listAllCustomers()
     {
         return userService.getAllCustomers();
     }
 
-    @GetMapping(path = "/admin/sellers")
+    @GetMapping(path = "/sellers")
     public List<SellersInfo> listAllSellers()
     {
         return userService.getAllSellers();
+    }
+
+    @PatchMapping(path = "/seller/activate/{id}")
+    public String activateSeller(@PathVariable long id)
+    {
+       return userService.activateSeller(id);
+    }
+
+    @PatchMapping(path = "/seller/deactivate/{id}")
+    public String deactivateSeller(@PathVariable long id)
+    {
+        return userService.deactivateSeller(id);
     }
 }
