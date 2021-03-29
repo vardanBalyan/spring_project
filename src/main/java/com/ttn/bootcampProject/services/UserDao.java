@@ -125,26 +125,23 @@ public class UserDao {
         return sellersInfoList;
     }
 
-    public String activateSeller(long id)
+    public Seller activateSeller(long id)
     {
         User user = userRepository.findByUserId(id);
         Seller seller = sellerRepository.findSellerById(id);
 
         if(user == null)
-            return "No user exist with the provided id.";
+            return null;
         else
         {
             if(seller == null)
-                return "The provided user id is not seller.";
+                return null;
         }
 
-        if(!user.isActive())
-        {
-            user.setActive(true);
-            userRepository.save(user);
-            return "Seller is now active.";
-        }
-        return "Seller is already active.";
+        user.setActive(true);
+        userRepository.save(user);
+
+        return seller;
     }
 
 
@@ -171,26 +168,23 @@ public class UserDao {
     }
 
 
-    public String activateCustomer(long id)
+    public Customer activateCustomer(long id)
     {
         User user = userRepository.findByUserId(id);
         Customer customer = customerRepository.findCustomerById(id);
 
         if(user == null)
-            return "No user exist with the provided id.";
+            return null;
         else
         {
             if(customer == null)
-                return "The provided user id is not customer.";
+                return null;
         }
 
-        if(!user.isActive())
-        {
-            user.setActive(true);
-            userRepository.save(user);
-            return "Customer is now active.";
-        }
-        return "Customer is already active.";
+        user.setActive(true);
+        userRepository.save(user);
+        return customer;
+
     }
 
     public String deactivateCustomer(long id)

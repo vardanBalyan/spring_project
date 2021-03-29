@@ -1,6 +1,5 @@
-package com.ttn.bootcampProject.resources;
+package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.services.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class LoginLogoutResource {
+public class LoginLogoutController {
 
     @Autowired
     private TokenStore tokenStore;
