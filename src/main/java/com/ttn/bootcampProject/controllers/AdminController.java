@@ -47,7 +47,7 @@ public class AdminController {
             return seller.getEmail();
         }
 
-        return "error";
+        return "error occured";
     }
 
     @PatchMapping(path = "/seller/deactivate/{id}")
