@@ -51,7 +51,7 @@ public class Bootstrap implements ApplicationRunner {
             customer.setLastName("Balyan");
             customer.setContact("5735677");
             customer.setDeleted(false);
-            customer.setEmail("vardanbalyan97@gmail.com");
+            customer.setEmail("vardan.balyan.vb@gmail.com");
             customer.setPassword(passwordEncoder.encode("pass"));
             customer.setActive(true);
 

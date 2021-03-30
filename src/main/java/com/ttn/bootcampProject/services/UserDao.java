@@ -9,12 +9,13 @@ import com.ttn.bootcampProject.helpingclasses.SellersInfo;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-@Repository
+@Service
 public class UserDao {
 
     @Autowired
@@ -207,5 +208,10 @@ public class UserDao {
             return "Customer is now de-active.";
         }
         return "Customer is already deactivated.";
+    }
+
+    public List<User> giveAllUsers()
+    {
+        return userRepository.allUsersInfo();
     }
 }

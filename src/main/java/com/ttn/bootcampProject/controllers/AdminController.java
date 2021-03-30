@@ -3,6 +3,7 @@ package com.ttn.bootcampProject.controllers;
 import com.ttn.bootcampProject.emailservices.ActivationMailService;
 import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.Seller;
+import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
 import com.ttn.bootcampProject.helpingclasses.SellersInfo;
 import com.ttn.bootcampProject.services.UserDao;
@@ -64,7 +65,7 @@ public class AdminController {
         if(customer != null)
         {
             try {
-                mailService.sendCustomerActivationMail(customer);
+                mailService.sendUserActivationMail(customer);
             }catch (MailException e)
             {
                 //error
@@ -80,5 +81,11 @@ public class AdminController {
     public String deactivateCustomer(@PathVariable long id)
     {
         return userService.deactivateCustomer(id);
+    }
+
+    @GetMapping(path = "/all-info/user")
+    public List<User> allInfoOfUsers()
+    {
+        return userService.giveAllUsers();
     }
 }

@@ -25,6 +25,8 @@ public class User {
     private String lastName;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String confirmPassword;
     private boolean isDeleted;
     private boolean isActive;
 
@@ -35,7 +37,11 @@ public class User {
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<UserRole> userRoles;
 
-   public void addRoles(UserRole userRole) {
+    public User() {
+        this.setActive(false);
+    }
+
+    public void addRoles(UserRole userRole) {
        if (userRole != null) {
            if (userRoles == null) {
                userRoles = new HashSet<>();
