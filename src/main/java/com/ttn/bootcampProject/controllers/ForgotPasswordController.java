@@ -19,7 +19,7 @@ public class ForgotPasswordController {
     }
 
     @PatchMapping(path = "/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam("token")String forgotPasswordToken, User user)
+    public ResponseEntity<String> resetPassword(@RequestParam("token")String forgotPasswordToken, @RequestBody User user)
     {
         return passwordService.resetPassword(user);
     }

@@ -52,7 +52,7 @@ public class ForgotPasswordService {
 
         if(user.getPassword().equals(user.getConfirmPassword()))
         {
-            registeredUser.setPassword(encoder.encode(user.getPassword()));
+            registeredUser.setPassword(user.getPassword());
             userRepository.save(registeredUser);
             confirmationTokenRepository.deleteById(token.getTokenId());
 
