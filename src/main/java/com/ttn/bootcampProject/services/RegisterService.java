@@ -1,6 +1,6 @@
 package com.ttn.bootcampProject.services;
 
-import com.ttn.bootcampProject.emailservices.ActivationMailService;
+import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.ConfirmationToken;
 import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.User;
@@ -22,7 +22,7 @@ public class RegisterService {
     @Autowired
     ConfirmationTokenRepository confirmationTokenRepository;
     @Autowired
-    ActivationMailService mailService;
+    MailService mailService;
     @Autowired
     CustomerRepository customerRepository;
 
@@ -41,14 +41,16 @@ public class RegisterService {
         mailMessage.setSubject("Complete Registration!");
         mailMessage.setFrom("vardanbalyan97@gmail.com");
         mailMessage.setText("To confirm your account, please click here : "
-                +"http://localhost:8080/confirm-account?token="+confirmationToken.getConfirmationToken());
+                +"http://localhost:8080/confirm-account?token="
+                +confirmationToken.getConfirmationToken());
 
         mailService.sendRegisterActivationMail(mailMessage);
     }
 
     public ResponseEntity<String> confirmCustomer(String confirmationToken)
     {
-        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+        ConfirmationToken token = confirmationTokenRepository
+                .findByConfirmationToken(confirmationToken);
 
         if (token != null) {
             User user = userRepository.findByEmail(token.getUser().getEmail());

@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ActivationMailService {
+public class MailService {
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -27,7 +27,14 @@ public class ActivationMailService {
         javaMailSender.send(mail);
     }
 
+    @Async
     public void sendRegisterActivationMail(SimpleMailMessage mail)
+    {
+        javaMailSender.send(mail);
+    }
+
+    @Async
+    public void sendForgotPasswordMail(SimpleMailMessage mail)
     {
         javaMailSender.send(mail);
     }

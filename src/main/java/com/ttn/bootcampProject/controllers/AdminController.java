@@ -1,6 +1,6 @@
 package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.emailservices.ActivationMailService;
+import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
@@ -24,7 +24,7 @@ public class AdminController {
     @Autowired
     UserDao userService;
     @Autowired
-    ActivationMailService mailService;
+    MailService mailService;
 
     @GetMapping(path = "/customers")
     public List<CustomerInfo> listAllCustomers()

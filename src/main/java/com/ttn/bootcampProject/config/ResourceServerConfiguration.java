@@ -53,6 +53,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .antMatchers("/").anonymous()
                 .antMatchers("/register-customer").permitAll()
                 .antMatchers("/confirm-account").permitAll()
+                .antMatchers("/forgot-password/*").permitAll()
+                .antMatchers("/reset-password").permitAll()
                 .antMatchers("/admin/*").hasAnyRole("ADMIN")
                 .antMatchers("/customer/*").hasAnyRole("CUSTOMER")
                 .antMatchers("/seller/*").hasAnyRole("SELLER")
