@@ -16,25 +16,19 @@ public class MailService {
     private JavaMailSender javaMailSender;
 
     @Async
-    public void sendUserActivationMail(User user) throws MailException
-    {
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(user.getEmail());
-        mail.setFrom("vardanbalyan97@gmail.com");
-        mail.setSubject("Activation mail");
-        mail.setText("Your account now has been activated.");
-
-        javaMailSender.send(mail);
-    }
-
-    @Async
-    public void sendRegisterMail(SimpleMailMessage mail)
+    public void sendActivationMail(SimpleMailMessage mail) throws MailException
     {
         javaMailSender.send(mail);
     }
 
     @Async
-    public void sendForgotPasswordMail(SimpleMailMessage mail)
+    public void sendRegisterMail (SimpleMailMessage mail) throws MailException
+    {
+        javaMailSender.send(mail);
+    }
+
+    @Async
+    public void sendForgotPasswordMail(SimpleMailMessage mail) throws MailException
     {
         javaMailSender.send(mail);
     }

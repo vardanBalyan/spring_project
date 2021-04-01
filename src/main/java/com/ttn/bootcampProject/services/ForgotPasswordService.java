@@ -1,5 +1,6 @@
 package com.ttn.bootcampProject.services;
 
+import com.ttn.bootcampProject.dtos.ForgotPasswordDto;
 import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.ConfirmationToken;
 import com.ttn.bootcampProject.entities.User;
@@ -43,22 +44,21 @@ public class ForgotPasswordService {
                 ,HttpStatus.CREATED);
     }
 
-    public ResponseEntity<String> resetPassword(User user)
+    public ResponseEntity<String> resetPassword(ForgotPasswordDto forgotPasswordDto)
     {
-        //System.out.println(">>>>>>>>>>>"+user.getPassword());
-        User registeredUser = userRepository.findByEmail(user.getEmail());
+        User registeredUser = userRepository.findByEmail(forgotPasswordDto.getEmail());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        ConfirmationToken token = confirmationTokenRepository.findByUserId(registeredUser.getId());
 
-        if(user.getPassword().equals(user.getConfirmPassword()))
+        if(forgotPasswordDto.getNewPassword().equals(forgotPasswordDto.getConfirmPassword()))
         {
-            registeredUser.setPassword(user.getPassword());
+            ConfirmationToken token = confirmationTokenRepository.findByUserId(registeredUser.getId());
+            registeredUser.setPassword(forgotPasswordDto.getNewPassword());
             userRepository.save(registeredUser);
             confirmationTokenRepository.deleteById(token.getTokenId());
 
             return new ResponseEntity("Password reset successful!!",HttpStatus.CREATED);
         }
 
-        return null;
+        return new ResponseEntity("New password and confirm password should be same.",HttpStatus.BAD_REQUEST);
     }
 }

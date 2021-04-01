@@ -6,10 +6,12 @@ import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.dtos.CustomerInfoDto;
 import com.ttn.bootcampProject.dtos.SellersInfoDto;
+import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.services.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,46 +41,25 @@ public class AdminController {
     }
 
     @PatchMapping(path = "/seller/activate/{id}")
-    public String activateSeller(@PathVariable long id)
+    public ResponseEntity<String> activateSeller(@PathVariable long id)
     {
-        Seller seller = userService.activateSeller(id);
-
-        if(seller!=null)
-        {
-            return seller.getEmail();
-        }
-
-        return "error occurred";
+        return userService.activateSeller(id);
     }
 
     @PatchMapping(path = "/seller/deactivate/{id}")
-    public String deactivateSeller(@PathVariable long id)
+    public ResponseEntity<String> deactivateSeller(@PathVariable long id)
     {
-        return userService.deactivateSeller(id);
+       return userService.deactivateSeller(id);
     }
 
     @PatchMapping(path = "/customer/activate/{id}")
-    public String activateCustomer(@PathVariable long id)
+    public ResponseEntity<String> activateCustomer(@PathVariable long id)
     {
-        Customer customer =userService.activateCustomer(id);
-
-        if(customer != null)
-        {
-            try {
-                mailService.sendUserActivationMail(customer);
-            }catch (MailException e)
-            {
-                //error
-                logger.info("error occurred"+ e.getMessage());
-            }
-            return "Customer is active";
-        }
-        else
-            return "customer does not exist";
+        return userService.activateCustomer(id);
     }
 
     @PatchMapping(path = "/customer/deactivate/{id}")
-    public String deactivateCustomer(@PathVariable long id)
+    public ResponseEntity<String> deactivateCustomer(@PathVariable long id)
     {
         return userService.deactivateCustomer(id);
     }

@@ -2,12 +2,16 @@ package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.config.AppUser;
 import com.ttn.bootcampProject.config.GrantAuthorityImpl;
+import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.dtos.CustomerInfoDto;
 import com.ttn.bootcampProject.dtos.SellersInfoDto;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +33,8 @@ public class UserDao {
     SellerRepository sellerRepository;
     @Autowired
     AddressRepository addressRepository;
+    @Autowired
+    MailService mailService;
 
     public AppUser loadUserByUsername(String email) {
         User user = userRepository.findByEmail(email);
@@ -125,88 +131,131 @@ public class UserDao {
         return sellersInfoDtoList;
     }
 
-    public Seller activateSeller(long id)
+    public ResponseEntity<String> activateSeller(long id)
     {
         User user = userRepository.findByUserId(id);
         Seller seller = sellerRepository.findSellerById(id);
 
         if(user == null)
-            return null;
+            return new ResponseEntity("User not found with particular id.",HttpStatus.NOT_FOUND);
         else
         {
             if(seller == null)
-                return null;
+                return new ResponseEntity("No seller found with particular id.",HttpStatus.NOT_FOUND);
+        }
+
+        if(seller.isActive())
+        {
+            return new ResponseEntity("Seller is already active.",HttpStatus.OK);
         }
 
         user.setActive(true);
         userRepository.save(user);
 
-        return seller;
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(seller.getEmail());
+        mailMessage.setSubject("Account status");
+        mailMessage.setFrom("vardanbalyan97@gmail.com");
+        mailMessage.setText("Your account is now active.");
+
+        mailService.sendActivationMail(mailMessage);
+
+        return new ResponseEntity("Seller is now active.",HttpStatus.ACCEPTED);
     }
 
 
-    public String deactivateSeller(long id)
+    public ResponseEntity<String> deactivateSeller(long id)
     {
         User user = userRepository.findByUserId(id);
         Seller seller = sellerRepository.findSellerById(id);
 
         if(user == null)
-            return "No user exist with the provided id.";
+            return new ResponseEntity("User not found with particular id.",HttpStatus.NOT_FOUND);
         else
         {
             if(seller == null)
-                return "The provided user id is not seller.";
+                return new ResponseEntity("No seller found with particular id.",HttpStatus.NOT_FOUND);
         }
 
-        if(user.isActive())
+        if(!seller.isActive())
         {
-            user.setActive(false);
-            userRepository.save(user);
-            return "Seller is now de-active.";
+            return new ResponseEntity("Seller is already de-active.",HttpStatus.OK);
         }
-        return "Seller is already deactivated.";
+
+        user.setActive(false);
+        userRepository.save(user);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(seller.getEmail());
+        mailMessage.setSubject("Account status");
+        mailMessage.setFrom("vardanbalyan97@gmail.com");
+        mailMessage.setText("Your account is now de-activated.");
+
+        mailService.sendActivationMail(mailMessage);
+
+        return new ResponseEntity("Seller is now de-active.",HttpStatus.ACCEPTED);
     }
 
 
-    public Customer activateCustomer(long id)
+    public ResponseEntity<String> activateCustomer(long id)
     {
         User user = userRepository.findByUserId(id);
         Customer customer = customerRepository.findCustomerById(id);
 
         if(user == null)
-            return null;
+            return new ResponseEntity("User not found with particular id.",HttpStatus.NOT_FOUND);
         else
         {
             if(customer == null)
-                return null;
+                return new ResponseEntity("No customer found with particular id.",HttpStatus.NOT_FOUND);
+        }
+
+        if(customer.isActive())
+        {
+            return new ResponseEntity("Customer is already active.",HttpStatus.OK);
         }
 
         user.setActive(true);
         userRepository.save(user);
-        return customer;
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(customer.getEmail());
+        mailMessage.setSubject("Account status");
+        mailMessage.setFrom("vardanbalyan97@gmail.com");
+        mailMessage.setText("Your account is now active.");
 
+        mailService.sendActivationMail(mailMessage);
+
+        return new ResponseEntity("Customer is now active.",HttpStatus.ACCEPTED);
     }
 
-    public String deactivateCustomer(long id)
+    public ResponseEntity<String> deactivateCustomer(long id)
     {
         User user = userRepository.findByUserId(id);
         Customer customer = customerRepository.findCustomerById(id);
 
         if(user == null)
-            return "No user exist with the provided id.";
+            return new ResponseEntity("User not found with particular id.",HttpStatus.NOT_FOUND);
         else
         {
             if(customer == null)
-                return "The provided user id is not customer.";
+                return new ResponseEntity("No customer found with particular id.",HttpStatus.NOT_FOUND);
         }
 
-        if(user.isActive())
+        if(!customer.isActive())
         {
-            user.setActive(false);
-            userRepository.save(user);
-            return "Customer is now de-active.";
+            return new ResponseEntity("Customer is already de-active.",HttpStatus.OK);
         }
-        return "Customer is already deactivated.";
+
+        user.setActive(false);
+        userRepository.save(user);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(customer.getEmail());
+        mailMessage.setSubject("Account status");
+        mailMessage.setFrom("vardanbalyan97@gmail.com");
+        mailMessage.setText("Your account is now de-activated.");
+
+        mailService.sendActivationMail(mailMessage);
+
+        return new ResponseEntity("Customer is now de-active.",HttpStatus.ACCEPTED);
     }
 
     public List<User> giveAllUsers()
