@@ -40,7 +40,7 @@ public class RegisterUserService {
         customer.setLastName(registerCustomer.getLastName());
         customer.setPassword(encoder.encode(registerCustomer.getPassword()));
         customer.setContact(registerCustomer.getContact());
-        customer.setAddresses(registerCustomer.getAddresses());
+        customer.addAddress(registerCustomer.getAddress());
 
         // setting the role for the customer
         Role role = roleRepository.findByAuthority("ROLE_CUSTOMER");
@@ -60,7 +60,7 @@ public class RegisterUserService {
                 +"http://localhost:8080/confirm-account?token="
                 +confirmationToken.getConfirmationToken());
 
-        mailService.sendRegisterActivationMail(mailMessage);
+        mailService.sendRegisterMail(mailMessage);
         return new ResponseEntity("Customer registered successfully!!. " +
                 "Please check your mail to activate your account.",HttpStatus.CREATED);
     }
@@ -79,6 +79,24 @@ public class RegisterUserService {
         return new ResponseEntity("Incorrect confirmation token.!",HttpStatus.BAD_REQUEST);
     }
 
+    public ResponseEntity<String> resendActivationLink(String email)
+    {
+        User user = userRepository.findByEmail(email);
+        ConfirmationToken token = confirmationTokenRepository.findByUserId(user.getId());
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Complete Registration!");
+        mailMessage.setFrom("vardanbalyan97@gmail.com");
+        mailMessage.setText("To confirm your account, please click here : "
+                +"http://localhost:8080/confirm-account?token="
+                +token.getConfirmationToken());
+
+        mailService.sendRegisterMail(mailMessage);
+        return new ResponseEntity("Please check your mail to activate your account."
+                ,HttpStatus.CREATED);
+    }
+
     public ResponseEntity<String> registerSeller(RegisterSellerDto registerSeller)
     {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -92,13 +110,21 @@ public class RegisterUserService {
         seller.setGst(registerSeller.getGst());
         seller.setCompanyName(registerSeller.getCompanyName());
         seller.setCompanyContact(registerSeller.getCompanyContact());
-        seller.setAddresses(registerSeller.getAddresses());
+        seller.addAddress(registerSeller.getAddress());
 
         Role role = roleRepository.findByAuthority("ROLE_SELLER");
         UserRole roleOfSeller = new UserRole(seller, role);
         seller.addRoles(roleOfSeller);
 
         sellerRepository.save(seller);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(seller.getEmail());
+        mailMessage.setSubject("Account created successfully!!");
+        mailMessage.setFrom("vardanbalyan97@gmail.com");
+        mailMessage.setText("Seller account successfully created and waiting for the approval.");
+
+        mailService.sendRegisterMail(mailMessage);
 
         return new ResponseEntity("Seller register successfully!!",HttpStatus.CREATED);
     }

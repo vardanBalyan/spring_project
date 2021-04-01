@@ -28,7 +28,7 @@ public class MailService {
     }
 
     @Async
-    public void sendRegisterActivationMail(SimpleMailMessage mail)
+    public void sendRegisterMail(SimpleMailMessage mail)
     {
         javaMailSender.send(mail);
     }

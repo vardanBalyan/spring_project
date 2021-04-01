@@ -9,6 +9,7 @@ public interface ConfirmationTokenRepository extends CrudRepository<Confirmation
 
     ConfirmationToken findByConfirmationToken(String confirmationToken);
 
-    @Query(value = "select * from confirmation_token where user_id=:id",nativeQuery = true)
+    @Query(value = "select * from confirmation_token where user_id=:id", nativeQuery = true)
     ConfirmationToken findByUserId(@Param("id") long id);
+
 }

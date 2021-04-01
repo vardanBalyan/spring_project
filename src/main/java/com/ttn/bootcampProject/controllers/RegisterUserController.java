@@ -31,4 +31,10 @@ public class RegisterUserController {
     {
         return service.registerSeller(sellerDto);
     }
+
+    @PostMapping(path = "/resend-activation-mail/{email}")
+    public ResponseEntity<String> resendActivationMail(@PathVariable String email)
+    {
+        return service.resendActivationLink(email);
+    }
 }

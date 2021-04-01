@@ -19,11 +19,12 @@ public class RegisterSellerDto {
     @Size(min = 3)
     private String lastName;
     private String password;
-    private Set<Address> addresses;
+    private Address address;
     @Size(min = 15, max = 15)
     private String gst;
     @Size(min = 10, max = 10)
     private String companyContact;
     @Size(min = 4)
     private String companyName;
+    private String confirmPassword;
 }

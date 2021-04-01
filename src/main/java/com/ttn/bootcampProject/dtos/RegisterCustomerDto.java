@@ -22,5 +22,6 @@ public class RegisterCustomerDto {
     private String password;
     @Size(min = 10, max = 10)
     private String contact;
-    private Set<Address> addresses;
+    private Address address;
+    private String confirmPassword;
 }
