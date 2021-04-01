@@ -6,6 +6,8 @@ import lombok.Setter;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,9 +21,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     @Column(unique = true)
+   // @Email
     private String email;
+   // @Size(min = 3)
     private String firstName;
+    //@Size(min = 3)
     private String middleName;
+    //@Size(min = 3)
     private String lastName;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;

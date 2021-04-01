@@ -45,7 +45,7 @@ public class ForgotPasswordService {
 
     public ResponseEntity<String> resetPassword(User user)
     {
-        System.out.println(">>>>>>>>>>>"+user.getPassword());
+        //System.out.println(">>>>>>>>>>>"+user.getPassword());
         User registeredUser = userRepository.findByEmail(user.getEmail());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         ConfirmationToken token = confirmationTokenRepository.findByUserId(registeredUser.getId());

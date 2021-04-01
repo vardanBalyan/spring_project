@@ -4,11 +4,10 @@ import com.ttn.bootcampProject.config.AppUser;
 import com.ttn.bootcampProject.config.GrantAuthorityImpl;
 import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
-import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
-import com.ttn.bootcampProject.helpingclasses.SellersInfo;
+import com.ttn.bootcampProject.dtos.CustomerInfoDto;
+import com.ttn.bootcampProject.dtos.SellersInfoDto;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -87,27 +86,27 @@ public class UserDao {
 
     }
 
-    public List<CustomerInfo> getAllCustomers()
+    public List<CustomerInfoDto> getAllCustomers()
     {
         List<Long> ids = customerRepository.fetchAllIdsOfCustomers();
-        List<CustomerInfo> customerInfoList = new ArrayList<>();
+        List<CustomerInfoDto> customerInfoDtoList = new ArrayList<>();
 
         for (Long id: ids) {
             User user = userRepository.findByUserId(id);
-            customerInfoList.add(new CustomerInfo(
+            customerInfoDtoList.add(new CustomerInfoDto(
                     user.getId(),
                     (user.getFirstName()+" "+user.getMiddleName()+" "+user.getLastName()),
                     user.getEmail(),
                     user.isActive()));
         }
 
-        return customerInfoList;
+        return customerInfoDtoList;
     }
 
-    public List<SellersInfo> getAllSellers()
+    public List<SellersInfoDto> getAllSellers()
     {
         List<Long> ids = sellerRepository.fetchAllIdsOfSellers();
-        List<SellersInfo> sellersInfoList = new ArrayList<>();
+        List<SellersInfoDto> sellersInfoDtoList = new ArrayList<>();
         List<Address> addresses;
 
         for (Long id: ids) {
@@ -115,7 +114,7 @@ public class UserDao {
             addresses = addressRepository.findByAddressId(id);
             Seller seller = sellerRepository.findSellerById(id);
 
-            sellersInfoList.add(new SellersInfo(
+            sellersInfoDtoList.add(new SellersInfoDto(
                     user.getId(),
                     (user.getFirstName()+" "+user.getMiddleName()+" "+user.getLastName()),
                     user.getEmail(),
@@ -123,7 +122,7 @@ public class UserDao {
                     seller.getCompanyContact(), addresses));
         }
 
-        return sellersInfoList;
+        return sellersInfoDtoList;
     }
 
     public Seller activateSeller(long id)

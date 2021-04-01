@@ -4,8 +4,8 @@ import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
-import com.ttn.bootcampProject.helpingclasses.CustomerInfo;
-import com.ttn.bootcampProject.helpingclasses.SellersInfo;
+import com.ttn.bootcampProject.dtos.CustomerInfoDto;
+import com.ttn.bootcampProject.dtos.SellersInfoDto;
 import com.ttn.bootcampProject.services.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +27,13 @@ public class AdminController {
     MailService mailService;
 
     @GetMapping(path = "/customers")
-    public List<CustomerInfo> listAllCustomers()
+    public List<CustomerInfoDto> listAllCustomers()
     {
         return userService.getAllCustomers();
     }
 
     @GetMapping(path = "/sellers")
-    public List<SellersInfo> listAllSellers()
+    public List<SellersInfoDto> listAllSellers()
     {
         return userService.getAllSellers();
     }
