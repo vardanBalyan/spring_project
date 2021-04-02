@@ -47,18 +47,26 @@ public class ForgotPasswordService {
     public ResponseEntity<String> resetPassword(ForgotPasswordDto forgotPasswordDto)
     {
         User registeredUser = userRepository.findByEmail(forgotPasswordDto.getEmail());
+        ConfirmationToken token = confirmationTokenRepository.findByUserId(registeredUser.getId());
+        long expirationTime = 120000;
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        if(forgotPasswordDto.getNewPassword().equals(forgotPasswordDto.getConfirmPassword()))
+        if((token.getCreatedDate().getTime()+expirationTime)>System.currentTimeMillis())
         {
-            ConfirmationToken token = confirmationTokenRepository.findByUserId(registeredUser.getId());
-            registeredUser.setPassword(forgotPasswordDto.getNewPassword());
-            userRepository.save(registeredUser);
-            confirmationTokenRepository.deleteById(token.getTokenId());
+            if(forgotPasswordDto.getNewPassword().equals(forgotPasswordDto.getConfirmPassword()))
+            {
+                System.out.println(">>>>>>>>>>>>>>"+token.getCreatedDate().getTime());
+                registeredUser.setPassword(forgotPasswordDto.getNewPassword());
+                userRepository.save(registeredUser);
+                confirmationTokenRepository.deleteById(token.getTokenId());
 
-            return new ResponseEntity("Password reset successful!!",HttpStatus.CREATED);
+                return new ResponseEntity("Password reset successful!!",HttpStatus.CREATED);
+            }
+
+            return new ResponseEntity("New password and confirm password should be same.",HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity("New password and confirm password should be same.",HttpStatus.BAD_REQUEST);
+        return new ResponseEntity("Token expired!!",HttpStatus.BAD_REQUEST);
+
     }
 }
