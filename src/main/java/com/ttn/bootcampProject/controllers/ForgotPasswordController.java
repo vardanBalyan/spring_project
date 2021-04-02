@@ -1,7 +1,6 @@
 package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.dtos.ForgotPasswordDto;
-import com.ttn.bootcampProject.entities.User;
+import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
 import com.ttn.bootcampProject.services.ForgotPasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,9 @@ public class ForgotPasswordController {
     }
 
     @PatchMapping(path = "/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam("token")String forgotPasswordToken, @RequestBody ForgotPasswordDto forgotPasswordDto)
+    public ResponseEntity<String> resetPassword(@RequestParam("token")String forgotPasswordToken
+            ,@RequestBody UpdatePasswordDto updatePasswordDto)
     {
-        return passwordService.resetPassword(forgotPasswordDto);
+        return passwordService.resetPassword(updatePasswordDto, forgotPasswordToken);
     }
 }

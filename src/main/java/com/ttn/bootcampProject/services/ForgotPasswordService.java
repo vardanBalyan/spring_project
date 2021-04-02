@@ -1,6 +1,6 @@
 package com.ttn.bootcampProject.services;
 
-import com.ttn.bootcampProject.dtos.ForgotPasswordDto;
+import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
 import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.ConfirmationToken;
 import com.ttn.bootcampProject.entities.User;
@@ -11,11 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
 
-@Service
+@Repository
 public class ForgotPasswordService {
 
     @Autowired
@@ -44,19 +43,31 @@ public class ForgotPasswordService {
                 ,HttpStatus.CREATED);
     }
 
-    public ResponseEntity<String> resetPassword(ForgotPasswordDto forgotPasswordDto)
+    public ResponseEntity<String> resetPassword(UpdatePasswordDto updatePasswordDto
+            , String forgotPasswordToken)
     {
-        User registeredUser = userRepository.findByEmail(forgotPasswordDto.getEmail());
-        ConfirmationToken token = confirmationTokenRepository.findByUserId(registeredUser.getId());
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(forgotPasswordToken);
         long expirationTime = 120000;
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+        if(token == null)
+        {
+            return new ResponseEntity("Invalid token",HttpStatus.NOT_FOUND);
+        }
+
+        User registeredUser = userRepository.findByUserId(token.getUser().getId());
+
+        if(registeredUser == null)
+        {
+            return new ResponseEntity("No user found",HttpStatus.NOT_FOUND);
+        }
+
         if((token.getCreatedDate().getTime()+expirationTime)>System.currentTimeMillis())
         {
-            if(forgotPasswordDto.getNewPassword().equals(forgotPasswordDto.getConfirmPassword()))
+            if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
             {
                 System.out.println(">>>>>>>>>>>>>>"+token.getCreatedDate().getTime());
-                registeredUser.setPassword(forgotPasswordDto.getNewPassword());
+                registeredUser.setPassword(updatePasswordDto.getNewPassword());
                 userRepository.save(registeredUser);
                 confirmationTokenRepository.deleteById(token.getTokenId());
 
@@ -66,6 +77,7 @@ public class ForgotPasswordService {
             return new ResponseEntity("New password and confirm password should be same.",HttpStatus.BAD_REQUEST);
         }
 
+        confirmationTokenRepository.deleteById(token.getTokenId());
         return new ResponseEntity("Token expired!!",HttpStatus.BAD_REQUEST);
 
     }

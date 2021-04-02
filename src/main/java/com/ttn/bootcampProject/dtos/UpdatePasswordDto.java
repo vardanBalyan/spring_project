@@ -7,10 +7,8 @@ import javax.validation.constraints.Email;
 
 @Getter
 @Setter
-public class ForgotPasswordDto {
+public class UpdatePasswordDto {
 
-    @Email
-    private String email;
     private String newPassword;
     private String confirmPassword;
 }

@@ -11,7 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -63,7 +65,7 @@ public class Bootstrap implements ApplicationRunner {
             address.setCity("new delhi");
             address.setAddressLine("212 Sadar bazar");
 
-            Set<Address> addresses = new HashSet<>();
+            List<Address> addresses = new ArrayList<>();
             addresses.add(address);
             customer.setAddresses(addresses);
 
@@ -90,7 +92,7 @@ public class Bootstrap implements ApplicationRunner {
             address2.setCity("new delhi");
             address2.setAddressLine("99 Karol Bagh");
 
-            Set<Address> sellerAddress = new HashSet<>();
+            List<Address> sellerAddress = new ArrayList<>();
             sellerAddress.add(address2);
             seller.setAddresses(sellerAddress);
 

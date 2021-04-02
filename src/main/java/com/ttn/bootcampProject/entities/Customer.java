@@ -19,6 +19,7 @@ import java.util.Set;
 public class Customer extends User{
 
     private String contact;
+    private String image;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_user_id")

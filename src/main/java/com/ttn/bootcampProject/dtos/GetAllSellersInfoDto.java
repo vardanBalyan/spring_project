@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SellersInfoDto {
+public class GetAllSellersInfoDto {
     private long id;
     private String fullName;
     private String email;
@@ -17,7 +17,7 @@ public class SellersInfoDto {
     private String companyContact;
     private List<Address> addresses;
 
-    public SellersInfoDto(long id, String fullName, String email, boolean isActive, String companyName, String companyContact, List<Address> addresses) {
+    public GetAllSellersInfoDto(long id, String fullName, String email, boolean isActive, String companyName, String companyContact, List<Address> addresses) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;

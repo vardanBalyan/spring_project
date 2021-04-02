@@ -11,5 +11,10 @@ import java.util.List;
 public interface AddressRepository extends CrudRepository<Address,Long> {
 
     @Query(value = "select * from address where user_id=:id", nativeQuery = true)
-    public List<Address> findByAddressId(@Param("id") long id);
+    public List<Address> findAddressByUserId(@Param("id") long id);
+
+    Address findById(long id);
+
+    @Query(value = "select id from address where user_id=:id",nativeQuery = true)
+    List<Long> findAddressIdsForUserId(@Param("id") long id);
 }

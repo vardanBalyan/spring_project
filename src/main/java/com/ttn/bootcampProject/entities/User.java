@@ -8,7 +8,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,7 +40,7 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
-    private Set<Address> addresses;
+    private List<Address> addresses;
 
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<UserRole> userRoles;
@@ -63,7 +65,7 @@ public class User {
         {
             if(addresses == null)
             {
-                addresses = new HashSet<>();
+                addresses = new ArrayList<>();
             }
             addresses.add(address);
         }

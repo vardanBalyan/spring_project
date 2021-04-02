@@ -5,21 +5,21 @@ import com.ttn.bootcampProject.config.GrantAuthorityImpl;
 import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.*;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
-import com.ttn.bootcampProject.dtos.CustomerInfoDto;
-import com.ttn.bootcampProject.dtos.SellersInfoDto;
+import com.ttn.bootcampProject.dtos.GetAllCustomerInfoDto;
+import com.ttn.bootcampProject.dtos.GetAllSellersInfoDto;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-@Service
-public class UserDao {
+@Repository
+public class UserDaoService {
 
     @Autowired
     UserRepository userRepository;
@@ -92,35 +92,35 @@ public class UserDao {
 
     }
 
-    public List<CustomerInfoDto> getAllCustomers()
+    public List<GetAllCustomerInfoDto> getAllCustomers()
     {
         List<Long> ids = customerRepository.fetchAllIdsOfCustomers();
-        List<CustomerInfoDto> customerInfoDtoList = new ArrayList<>();
+        List<GetAllCustomerInfoDto> getAllCustomerInfoDtoList = new ArrayList<>();
 
         for (Long id: ids) {
             User user = userRepository.findByUserId(id);
-            customerInfoDtoList.add(new CustomerInfoDto(
+            getAllCustomerInfoDtoList.add(new GetAllCustomerInfoDto(
                     user.getId(),
                     (user.getFirstName()+" "+user.getMiddleName()+" "+user.getLastName()),
                     user.getEmail(),
                     user.isActive()));
         }
 
-        return customerInfoDtoList;
+        return getAllCustomerInfoDtoList;
     }
 
-    public List<SellersInfoDto> getAllSellers()
+    public List<GetAllSellersInfoDto> getAllSellers()
     {
         List<Long> ids = sellerRepository.fetchAllIdsOfSellers();
-        List<SellersInfoDto> sellersInfoDtoList = new ArrayList<>();
+        List<GetAllSellersInfoDto> getAllSellersInfoDtoList = new ArrayList<>();
         List<Address> addresses;
 
         for (Long id: ids) {
             User user = userRepository.findByUserId(id);
-            addresses = addressRepository.findByAddressId(id);
+            addresses = addressRepository.findAddressByUserId(id);
             Seller seller = sellerRepository.findSellerById(id);
 
-            sellersInfoDtoList.add(new SellersInfoDto(
+            getAllSellersInfoDtoList.add(new GetAllSellersInfoDto(
                     user.getId(),
                     (user.getFirstName()+" "+user.getMiddleName()+" "+user.getLastName()),
                     user.getEmail(),
@@ -128,7 +128,7 @@ public class UserDao {
                     seller.getCompanyContact(), addresses));
         }
 
-        return sellersInfoDtoList;
+        return getAllSellersInfoDtoList;
     }
 
     public ResponseEntity<String> activateSeller(long id)

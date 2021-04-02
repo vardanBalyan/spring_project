@@ -1,6 +1,6 @@
 package com.ttn.bootcampProject.config;
 
-import com.ttn.bootcampProject.services.UserDao;
+import com.ttn.bootcampProject.services.UserDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,12 +15,12 @@ public class AppUserDetailsService implements UserDetailsService {
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    UserDao userDao;
+    UserDaoService userDaoService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Trying to authenticate user ::" + username);
-        UserDetails userDetails = userDao.loadUserByUsername(username);
+        UserDetails userDetails = userDaoService.loadUserByUsername(username);
         return userDetails;
     }
 }

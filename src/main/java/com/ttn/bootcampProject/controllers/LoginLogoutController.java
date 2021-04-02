@@ -1,6 +1,6 @@
 package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.services.UserDao;
+import com.ttn.bootcampProject.services.UserDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -14,7 +14,7 @@ public class LoginLogoutController {
     @Autowired
     private TokenStore tokenStore;
     @Autowired
-    private UserDao userService;
+    private UserDaoService userService;
 
     @GetMapping("/")
     public String index(){
