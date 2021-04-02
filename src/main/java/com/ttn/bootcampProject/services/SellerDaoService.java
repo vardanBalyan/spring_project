@@ -3,7 +3,6 @@ package com.ttn.bootcampProject.services;
 import com.ttn.bootcampProject.dtos.SellerProfileDto;
 import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
 import com.ttn.bootcampProject.entities.Address;
-import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.repos.AddressRepository;

@@ -1,6 +1,7 @@
 package com.ttn.bootcampProject.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ttn.bootcampProject.constraints.ValidPassword;
 import com.ttn.bootcampProject.entities.Address;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class RegisterCustomerDto {
     private String middleName;
     @Size(min = 3, message = "should contain at least {min} characters")
     private String lastName;
+    @ValidPassword
     private String password;
     @Size(min = 10, max = 10, message = "should contain at least {min} digits only")
     private String contact;

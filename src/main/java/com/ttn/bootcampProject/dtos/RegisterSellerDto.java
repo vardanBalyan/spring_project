@@ -1,5 +1,6 @@
 package com.ttn.bootcampProject.dtos;
 
+import com.ttn.bootcampProject.constraints.ValidPassword;
 import com.ttn.bootcampProject.entities.Address;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class RegisterSellerDto {
     private String middleName;
     @Size(min = 3, message = "should contain at least {min} characters")
     private String lastName;
+    @ValidPassword
     private String password;
     private Address address;
     @Size(min = 15, max = 15, message = "should contain valid gst number with 15 characters")
