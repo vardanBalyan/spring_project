@@ -118,7 +118,7 @@ public class UserDaoService {
         for (Long id: ids) {
             User user = userRepository.findByUserId(id);
             addresses = addressRepository.findAddressByUserId(id);
-            Seller seller = sellerRepository.findSellerById(id);
+            Seller seller = sellerRepository.findSellerByUserId(id);
 
             getAllSellersInfoDtoList.add(new GetAllSellersInfoDto(
                     user.getId(),
@@ -134,7 +134,7 @@ public class UserDaoService {
     public ResponseEntity<String> activateSeller(long id)
     {
         User user = userRepository.findByUserId(id);
-        Seller seller = sellerRepository.findSellerById(id);
+        Seller seller = sellerRepository.findSellerByUserId(id);
 
         if(user == null)
             return new ResponseEntity("User not found with particular id.",HttpStatus.NOT_FOUND);
@@ -167,7 +167,7 @@ public class UserDaoService {
     public ResponseEntity<String> deactivateSeller(long id)
     {
         User user = userRepository.findByUserId(id);
-        Seller seller = sellerRepository.findSellerById(id);
+        Seller seller = sellerRepository.findSellerByUserId(id);
 
         if(user == null)
             return new ResponseEntity("User not found with particular id.",HttpStatus.NOT_FOUND);

@@ -65,7 +65,6 @@ public class CustomerDaoService {
         User user = userRepository.findByEmail(email);
         Customer customer = customerRepository.findCustomerById(user.getId());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        System.out.println(">>>>>>>>>>>>>>>>>>>"+encoder.matches(updatePasswordDto.getNewPassword(), customer.getPassword()));
 
         if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
         {

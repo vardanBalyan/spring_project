@@ -13,5 +13,5 @@ public interface SellerRepository extends CrudRepository<Seller, Long> {
     public List<Long> fetchAllIdsOfSellers();
 
     @Query(value = "select * from seller where user_id=:id", nativeQuery = true)
-    public Seller findSellerById(@Param("id") long id);
+    public Seller findSellerByUserId(@Param("id") long id);
 }

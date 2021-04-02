@@ -17,7 +17,7 @@ public class Seller extends User{
     private String gst;
     private String companyContact;
     private String companyName;
-
+    private String image;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "seller_user_id")
