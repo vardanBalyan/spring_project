@@ -18,8 +18,9 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
+    @Column(unique = true)
     private String name;
-
+    private boolean hasChild;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_category_id")
     private Set<Category> categorySet;

@@ -62,7 +62,7 @@ public class ForgotPasswordService {
             return new ResponseEntity("No user found",HttpStatus.NOT_FOUND);
         }
 
-        if((token.getCreatedDate().getTime()+expirationTime)>System.currentTimeMillis())
+        if((token.getCreatedDate().getTime() + expirationTime) > System.currentTimeMillis())
         {
             if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
             {

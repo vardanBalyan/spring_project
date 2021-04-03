@@ -1,9 +1,13 @@
 package com.ttn.bootcampProject.controllers;
 
+import com.ttn.bootcampProject.dtos.AddCategoryDto;
 import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.dtos.GetAllCustomerInfoDto;
 import com.ttn.bootcampProject.dtos.GetAllSellersInfoDto;
+import com.ttn.bootcampProject.entities.products.categories.Category;
+import com.ttn.bootcampProject.exceptions.UserNotFoundException;
+import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.UserDaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,7 +27,7 @@ public class AdminController {
     @Autowired
     UserDaoService userService;
     @Autowired
-    MailService mailService;
+    CategoryService categoryService;
 
     @GetMapping(path = "/customers")
     public List<GetAllCustomerInfoDto> listAllCustomers()
@@ -65,4 +70,34 @@ public class AdminController {
     {
         return userService.giveAllUsers();
     }
+
+    @PostMapping("/add-category")
+    public ResponseEntity<String> addCategory(@Valid @RequestBody AddCategoryDto categoryDto)
+    {
+        return categoryService.addCategory(categoryDto);
+    }
+
+    @GetMapping("/category/{id}")
+    public AddCategoryDto viewACategory(@PathVariable long id)
+    {
+        AddCategoryDto categoryDto = categoryService.viewACategory(id);
+        if(categoryDto == null)
+        {
+            throw new UserNotFoundException("No category found for the specified category id.");
+        }
+        return categoryDto;
+    }
+
+    @GetMapping("/all-category")
+    public List<AddCategoryDto> viewAllCategory()
+    {
+        return categoryService.viewAllCategory();
+    }
+
+    @PatchMapping("/update-category")
+    public ResponseEntity<String> updateCategory(@Valid @RequestBody AddCategoryDto categoryDto)
+    {
+        return categoryService.updateCategory(categoryDto);
+    }
+
 }
