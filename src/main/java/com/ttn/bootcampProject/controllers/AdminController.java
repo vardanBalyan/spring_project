@@ -1,11 +1,13 @@
 package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.AddCategoryDto;
+import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
 import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.dtos.GetAllCustomerInfoDto;
 import com.ttn.bootcampProject.dtos.GetAllSellersInfoDto;
 import com.ttn.bootcampProject.entities.products.categories.Category;
+import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.UserDaoService;
@@ -88,7 +90,7 @@ public class AdminController {
         return categoryDto;
     }
 
-    @GetMapping("/all-category")
+    @GetMapping("/category")
     public List<AddCategoryDto> viewAllCategory()
     {
         return categoryService.viewAllCategory();
@@ -98,6 +100,24 @@ public class AdminController {
     public ResponseEntity<String> updateCategory(@Valid @RequestBody AddCategoryDto categoryDto)
     {
         return categoryService.updateCategory(categoryDto);
+    }
+
+    @PostMapping("/add-category-metadata-field")
+    public ResponseEntity<String> addCategoryMetadataField(@RequestParam("fieldName") String fieldName)
+    {
+        return categoryService.addMetadataField(fieldName);
+    }
+
+    @GetMapping("/category-metadata-field")
+    public List<CategoryMetadataField> getAllMetadataFields()
+    {
+        return categoryService.viewAllMetadataFields();
+    }
+
+    @PostMapping("/add-metadata-field-values")
+    public ResponseEntity<String> addMetadataFieldValues(@RequestBody CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    {
+        return categoryService.addCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
     }
 
 }

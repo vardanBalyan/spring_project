@@ -1,5 +1,6 @@
 package com.ttn.bootcampProject.entities.products.categories;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ public class CategoryMetadataField {
     private long id;
     private String name;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "categoryMetadataField")
     Set<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 

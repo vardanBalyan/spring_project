@@ -1,7 +1,13 @@
 package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.dtos.AddCategoryDto;
+import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
 import com.ttn.bootcampProject.entities.products.categories.Category;
+import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
+import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
+import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValuesId;
+import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
+import com.ttn.bootcampProject.repos.CategoryMetadataFieldValuesRepository;
 import com.ttn.bootcampProject.repos.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +23,10 @@ public class CategoryService {
 
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    CategoryMetadataFieldRepository categoryMetadataFieldRepository;
+    @Autowired
+    CategoryMetadataFieldValuesRepository categoryMetadataFieldValuesRepository;
 
     public ResponseEntity<String> addCategory(AddCategoryDto categoryDto)
     {
@@ -86,5 +96,65 @@ public class CategoryService {
         category.setName(categoryDto.getName());
         categoryRepository.save(category);
         return new ResponseEntity("Category updated successfully.",HttpStatus.ACCEPTED);
+    }
+
+    public ResponseEntity<String> addMetadataField(String fieldName)
+    {
+        List<String> fieldNamesList = categoryMetadataFieldRepository.findAllFieldNames();
+
+        if(fieldNamesList.contains(fieldName.toLowerCase()))
+        {
+            return new ResponseEntity("Metadata filed already exist. Please give a unique name."
+                    ,HttpStatus.BAD_REQUEST);
+        }
+        CategoryMetadataField metadataField = new CategoryMetadataField();
+        metadataField.setName(fieldName.toLowerCase());
+        categoryMetadataFieldRepository.save(metadataField);
+        return new ResponseEntity("Added new category metadata field.",HttpStatus.ACCEPTED);
+    }
+
+    public List<CategoryMetadataField> viewAllMetadataFields()
+    {
+        return categoryMetadataFieldRepository.allMetadataFields();
+    }
+
+    public ResponseEntity<String> addCategoryMetadataFieldValues(CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    {
+        CategoryMetadataField categoryMetadata = categoryMetadataFieldRepository
+                .findById(categoryMetadataFieldValuesDto.getMetadataId());
+        Category category = categoryRepository
+                .findById(categoryMetadataFieldValuesDto.getCategoryId());
+
+        if(categoryMetadata == null)
+        {
+            return new ResponseEntity("No metadata found for the provided metadata id."
+                    ,HttpStatus.NOT_FOUND);
+        }
+
+        if(category == null)
+        {
+            return new ResponseEntity("No category found for the provided category id."
+                    ,HttpStatus.NOT_FOUND);
+        }
+
+        if(category.isHasChild())
+        {
+            return new ResponseEntity("Category id should be of leaf node category."
+                    ,HttpStatus.BAD_REQUEST);
+        }
+
+        CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
+
+        CategoryMetadataFieldValuesId metadataFieldValuesId = new CategoryMetadataFieldValuesId();
+        metadataFieldValuesId.setCategoryId(category.getId());
+        metadataFieldValuesId.setCategoryMetadataFieldId(categoryMetadata.getId());
+
+        metadataFieldValues.setId(metadataFieldValuesId);
+        metadataFieldValues.setCategory(category);
+        metadataFieldValues.setCategoryMetadataField(categoryMetadata);
+        metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
+        categoryMetadataFieldValuesRepository.save(metadataFieldValues);
+        return new ResponseEntity("New metadata field values created successfully."
+                ,HttpStatus.CREATED);
     }
 }
