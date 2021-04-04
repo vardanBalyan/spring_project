@@ -157,4 +157,20 @@ public class CategoryService {
         return new ResponseEntity("New metadata field values created successfully."
                 ,HttpStatus.CREATED);
     }
+
+    public ResponseEntity<String> updateCategoryMetadataFieldValues(CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    {
+        CategoryMetadataFieldValues metadataFieldValues = categoryMetadataFieldValuesRepository
+                .findByMetadataCompositeId(categoryMetadataFieldValuesDto.getCategoryId()
+                        ,categoryMetadataFieldValuesDto.getMetadataId());
+
+        if(metadataFieldValues == null)
+        {
+            return new ResponseEntity("No metadata field values found for the provided category and metadata id."
+                    ,HttpStatus.NOT_FOUND);
+        }
+        metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
+        categoryMetadataFieldValuesRepository.save(metadataFieldValues);
+        return new ResponseEntity("Values updated successfully.",HttpStatus.ACCEPTED);
+    }
 }

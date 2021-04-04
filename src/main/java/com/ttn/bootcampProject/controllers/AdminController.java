@@ -120,4 +120,10 @@ public class AdminController {
         return categoryService.addCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
     }
 
+    @PatchMapping("/update-metadata-field-values")
+    public ResponseEntity<String> updateMetadataFieldValues(@RequestBody CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    {
+        return categoryService.updateCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
+    }
+
 }

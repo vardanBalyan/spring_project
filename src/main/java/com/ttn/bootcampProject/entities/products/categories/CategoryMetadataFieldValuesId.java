@@ -3,6 +3,7 @@ package com.ttn.bootcampProject.entities.products.categories;
 import lombok.*;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -13,7 +14,9 @@ import java.util.Objects;
 @AllArgsConstructor
 public class CategoryMetadataFieldValuesId implements Serializable {
 
+    @NotNull
     private long categoryId;
+    @NotNull
     private long categoryMetadataFieldId;
 
     @Override
