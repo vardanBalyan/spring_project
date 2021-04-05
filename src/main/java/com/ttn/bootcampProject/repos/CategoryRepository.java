@@ -12,7 +12,7 @@ public interface CategoryRepository extends CrudRepository<Category, Integer> {
     Category findById(long id);
 
     @Query(value = "select parent_category_id from category where id=:id",nativeQuery = true)
-    Long findParentIdByCategoryId(@Param("id") long id);
+    Long findParentIdsByCategoryId(@Param("id") long id);
 
     @Query(value = "select * from category", nativeQuery = true)
     List<Category> getAllCategories();
@@ -25,4 +25,7 @@ public interface CategoryRepository extends CrudRepository<Category, Integer> {
 
     @Query(value = "select * from category where parent_category_id=:parentId", nativeQuery = true)
     List<Category> findAllChildForParentId(@Param("parentId") long parentId);
+
+    @Query("select name from Category")
+    List<String> getAllCategoryNames();
 }

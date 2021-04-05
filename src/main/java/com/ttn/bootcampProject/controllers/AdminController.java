@@ -6,6 +6,7 @@ import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.dtos.GetAllCustomerInfoDto;
 import com.ttn.bootcampProject.dtos.GetAllSellersInfoDto;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
+import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.UserDaoService;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -83,7 +85,7 @@ public class AdminController {
         AddCategoryDto categoryDto = categoryService.viewACategory(id);
         if(categoryDto == null)
         {
-            throw new UserNotFoundException("No category found for the specified category id.");
+            throw new CategoryNotFoundException("No category found for the specified category id.");
         }
         return categoryDto;
     }
@@ -101,7 +103,7 @@ public class AdminController {
     }
 
     @PostMapping("/add-category-metadata-field")
-    public ResponseEntity<String> addCategoryMetadataField(@RequestParam("fieldName") String fieldName)
+    public ResponseEntity<String> addCategoryMetadataField(@RequestParam("fieldName") @NotNull String fieldName)
     {
         return categoryService.addMetadataField(fieldName);
     }

@@ -9,7 +9,6 @@ import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFiel
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValuesId;
 import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
-import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
 import com.ttn.bootcampProject.repos.CategoryMetadataFieldValuesRepository;
 import com.ttn.bootcampProject.repos.CategoryRepository;
@@ -44,6 +43,8 @@ public class CategoryService {
                 return new ResponseEntity("No parent exist for the specified parent id."
                         ,HttpStatus.NOT_FOUND);
             }
+            //adds the category as child category for the provided parent id
+
             Set<Category> childCategorySet = parentCategory.getCategorySet();
             childCategorySet.add(category);
             parentCategory.setCategorySet(childCategorySet);
@@ -52,6 +53,8 @@ public class CategoryService {
             return new ResponseEntity("Added as child category for specified parent category id."
                     ,HttpStatus.ACCEPTED);
         }
+
+        // saves as new parent if parent id not provided
         categoryRepository.save(category);
         return new ResponseEntity("Added as new parent category.",HttpStatus.ACCEPTED);
     }
@@ -64,23 +67,27 @@ public class CategoryService {
         {
             AddCategoryDto categoryDto = new AddCategoryDto();
             categoryDto.setName(category.getName());
-            categoryDto.setParentId(categoryRepository.findParentIdByCategoryId(category.getId()));
+            categoryDto.setParentId(categoryRepository.findParentIdsByCategoryId(category.getId()));
             categoryDto.setHasChild(categoryDto.isHasChild());
             return categoryDto;
         }
+
+        // returns null if category not found for the provided id
         return null;
     }
 
     public List<AddCategoryDto> viewAllCategoryAdmin()
     {
+        // gets all categories from the database
         List<Category> categoryList = categoryRepository.getAllCategories();
         List<AddCategoryDto> categoryDtoList = new ArrayList<>();
 
+        // assigning categories to the List of AddCategoryDto
         for (Category category:categoryList) {
             AddCategoryDto categoryDto = new AddCategoryDto();
             categoryDto.setId(category.getId());
             categoryDto.setName(category.getName());
-            categoryDto.setParentId(categoryRepository.findParentIdByCategoryId(category.getId()));
+            categoryDto.setParentId(categoryRepository.findParentIdsByCategoryId(category.getId()));
             categoryDto.setHasChild(category.isHasChild());
             categoryDtoList.add(categoryDto);
         }
@@ -91,11 +98,22 @@ public class CategoryService {
     {
         Category category = categoryRepository.findById(categoryDto.getId());
 
+        // checks if category exist for the provided id
+
         if(category == null)
         {
             return new ResponseEntity("No category found for specified id.",HttpStatus.NOT_FOUND);
         }
-        category.setName(categoryDto.getName());
+
+        List<String> categoryNames = categoryRepository.getAllCategoryNames();
+
+        // checks if category name already exist in the table
+        if(categoryNames.contains(categoryDto.getName().toLowerCase()))
+        {
+            return new ResponseEntity("Category name already exist. Please give a unique name."
+                    ,HttpStatus.BAD_REQUEST);
+        }
+        category.setName(categoryDto.getName().toLowerCase());
         categoryRepository.save(category);
         return new ResponseEntity("Category updated successfully.",HttpStatus.ACCEPTED);
     }
@@ -104,6 +122,7 @@ public class CategoryService {
     {
         List<String> fieldNamesList = categoryMetadataFieldRepository.findAllFieldNames();
 
+        // checks if metadata already exist in the table
         if(fieldNamesList.contains(fieldName.toLowerCase()))
         {
             return new ResponseEntity("Metadata filed already exist. Please give a unique name."
@@ -122,8 +141,10 @@ public class CategoryService {
 
     public ResponseEntity<String> addCategoryMetadataFieldValues(CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
     {
+        // getting metadata for the provided id
         CategoryMetadataField categoryMetadata = categoryMetadataFieldRepository
                 .findById(categoryMetadataFieldValuesDto.getMetadataId());
+        // getting category for the provided id
         Category category = categoryRepository
                 .findById(categoryMetadataFieldValuesDto.getCategoryId());
 
@@ -139,6 +160,7 @@ public class CategoryService {
                     ,HttpStatus.NOT_FOUND);
         }
 
+        // checking if the category is leaf node or not
         if(category.isHasChild())
         {
             return new ResponseEntity("Category id should be of leaf node category."
@@ -147,10 +169,12 @@ public class CategoryService {
 
         CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
 
+        // creating the composite key id for the CategoryMetadataFieldValues table
         CategoryMetadataFieldValuesId metadataFieldValuesId = new CategoryMetadataFieldValuesId();
         metadataFieldValuesId.setCategoryId(category.getId());
         metadataFieldValuesId.setCategoryMetadataFieldId(categoryMetadata.getId());
 
+        // assigning parameters and saving
         metadataFieldValues.setId(metadataFieldValuesId);
         metadataFieldValues.setCategory(category);
         metadataFieldValues.setCategoryMetadataField(categoryMetadata);
@@ -162,6 +186,7 @@ public class CategoryService {
 
     public ResponseEntity<String> updateCategoryMetadataFieldValues(CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
     {
+        // getting the metadata filed value for the provided category id and metadata id to check if exist or not
         CategoryMetadataFieldValues metadataFieldValues = categoryMetadataFieldValuesRepository
                 .findByMetadataCompositeId(categoryMetadataFieldValuesDto.getCategoryId()
                         ,categoryMetadataFieldValuesDto.getMetadataId());
@@ -171,6 +196,8 @@ public class CategoryService {
             return new ResponseEntity("No metadata field values found for the provided category and metadata id."
                     ,HttpStatus.NOT_FOUND);
         }
+
+        // updating values
         metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
         categoryMetadataFieldValuesRepository.save(metadataFieldValues);
         return new ResponseEntity("Values updated successfully.",HttpStatus.ACCEPTED);
@@ -181,8 +208,10 @@ public class CategoryService {
     {
         List<ViewAllCategorySeller> categorySellerList = new ArrayList<>();
 
+        // getting all leaf node categories
         List<Category> leafCategoryList = categoryRepository.getAllLeafCategory();
 
+        // getting all metadata field
         List<CategoryMetadataField> allCategoryMetadata = categoryMetadataFieldRepository.allMetadataFields();
 
         for (Category leafCategory: leafCategoryList) {
@@ -192,6 +221,7 @@ public class CategoryService {
 
             Map<String, String> metadataAndValuesMap = new HashMap<>();
 
+            // assigning metadata and metadata values for the particular leaf node category
             for (CategoryMetadataField metadataField: allCategoryMetadata) {
                 metadataAndValuesMap.put(metadataField.getName(), categoryMetadataFieldValuesRepository
                         .valueByCompositeId(leafCategory.getId(), metadataField.getId()));

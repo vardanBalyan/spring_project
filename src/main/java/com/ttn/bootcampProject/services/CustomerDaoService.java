@@ -28,6 +28,7 @@ public class CustomerDaoService {
 
     public CustomerProfileDto getProfile(String email)
     {
+        // getting the user details
         User user = userRepository.findByEmail(email);
         Customer customer = customerRepository.findCustomerById(user.getId());
         CustomerProfileDto customerProfile = new CustomerProfileDto();
@@ -43,13 +44,16 @@ public class CustomerDaoService {
 
     public List<Address> getAddresses(String email)
     {
+        // returning the list of addresses
         User user = userRepository.findByEmail(email);
         return user.getAddresses();
     }
 
     public ResponseEntity<String> updateProfile(CustomerProfileDto customerProfileDto, String email)
     {
+        // getting the user details
         User user = userRepository.findByEmail(email);
+        // updating profile
         Customer customer = customerRepository.findCustomerById(user.getId());
         customer.setFirstName(customerProfileDto.getFirstName());
         customer.setLastName(customerProfileDto.getLastName());
@@ -62,12 +66,15 @@ public class CustomerDaoService {
 
     public ResponseEntity<String> updatePassword(UpdatePasswordDto updatePasswordDto, String email)
     {
+        //  getting the user details
         User user = userRepository.findByEmail(email);
         Customer customer = customerRepository.findCustomerById(user.getId());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+        // checking if new password and confirm password is same or not
         if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
         {
+            // checking if current password is same as the new password
             if(encoder.matches(updatePasswordDto.getNewPassword(), customer.getPassword()))
             {
                 return new ResponseEntity("Current password and new password should be different."
@@ -83,8 +90,10 @@ public class CustomerDaoService {
 
     public ResponseEntity<String> addNewAddress(Address address, String email)
     {
+        // getting user details
         User user = userRepository.findByEmail(email);
         Customer customer = customerRepository.findCustomerById(user.getId());
+        //getting the list of address for the customer from database
         List<Address> addressList = customer.getAddresses();
 
         Address newAddress = new Address();
@@ -95,7 +104,9 @@ public class CustomerDaoService {
         newAddress.setLabel(address.getLabel());
         newAddress.setZipCode(address.getZipCode());
 
+        // adding new address to the list
         addressList.add(newAddress);
+        // updating the list
         customer.setAddresses(addressList);
         customerRepository.save(customer);
 
@@ -105,9 +116,12 @@ public class CustomerDaoService {
 
     public ResponseEntity<String> updateAnAddress(Address address, long id, String email)
     {
+        // getting user details
         User user = userRepository.findByEmail(email);
+        // getting all the ids of address from the list of address for the customer
         List<Long> addressIds = addressRepository.findAddressIdsForUserId(user.getId());
 
+        // checking if the id provided to update exist in the ids we got from the list of addresses of customer
         if(addressIds.contains(id))
         {
             Address updatedAddress = addressRepository.findById(id);
@@ -118,6 +132,7 @@ public class CustomerDaoService {
             updatedAddress.setCity(address.getCity());
             updatedAddress.setZipCode(address.getZipCode());
 
+            // updating address
             addressRepository.save(updatedAddress);
             return new ResponseEntity("Address updated successfully.",HttpStatus.CREATED);
         }
@@ -126,11 +141,15 @@ public class CustomerDaoService {
 
     public ResponseEntity<String> deleteAnAddress(long id, String email)
     {
+        // getting user details
         User user = userRepository.findByEmail(email);
+        // getting all the ids of address from the list of address for the customer
         List<Long> addressIds = addressRepository.findAddressIdsForUserId(user.getId());
 
+        // checking if the id provided to update exist in the ids we got from the list of addresses of customer
         if(addressIds.contains(id))
         {
+            // deleting address
             addressRepository.deleteById(id);
             return new ResponseEntity("Address deleted successfully.",HttpStatus.CREATED);
         }

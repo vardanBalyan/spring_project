@@ -28,6 +28,7 @@ public class SellerDaoService {
 
     public SellerProfileDto getProfile(String email)
     {
+        // getting user details
         User user = userRepository.findByEmail(email);
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
@@ -43,14 +44,17 @@ public class SellerDaoService {
         sellerProfile.setImage(seller.getImage());
         sellerProfile.setLastName(seller.getLastName());
 
+        // returning seller profile info
         return  sellerProfile;
     }
 
     public ResponseEntity<String> updateProfile(SellerProfileDto sellerProfileDto, String email)
     {
+        // getting user for provided mail id
         User user = userRepository.findByEmail(email);
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
+        // updating parameters
         seller.setFirstName(sellerProfileDto.getFirstName());
         seller.setLastName(sellerProfileDto.getLastName());
         seller.setCompanyContact(sellerProfileDto.getCompanyContact());
@@ -64,12 +68,15 @@ public class SellerDaoService {
 
     public ResponseEntity<String> updatePassword(UpdatePasswordDto updatePasswordDto, String email)
     {
+        // getting user details
         User user = userRepository.findByEmail(email);
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+        // checking if new password and confirm password is same or not
         if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
         {
+            // checking if current password is same as the new password
             if(encoder.matches(updatePasswordDto.getNewPassword(), seller.getPassword()))
             {
                 return new ResponseEntity("Current password and new password should be different."

@@ -27,9 +27,24 @@ public class ForgotPasswordService {
     public ResponseEntity<String> forgotPassword(String email)
     {
         User user = userRepository.findByEmail(email);
+
+        // checking if user exist
+        if(user == null)
+        {
+            return new ResponseEntity("Account does not exist for the provided mail id.",HttpStatus.BAD_REQUEST);
+        }
+
+        // checking if user is active or not
+        if(!user.isActive())
+        {
+            return new ResponseEntity("Account is de-activated account.",HttpStatus.BAD_REQUEST);
+        }
+
+        // creating and saving a token for the user fetched by mail id
         ConfirmationToken token = new ConfirmationToken(user);
         confirmationTokenRepository.save(token);
 
+        // sending mail to the user for further process
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Reset account password!");
@@ -43,13 +58,17 @@ public class ForgotPasswordService {
                 ,HttpStatus.CREATED);
     }
 
+
     public ResponseEntity<String> resetPassword(UpdatePasswordDto updatePasswordDto
             , String forgotPasswordToken)
     {
+        // getting the token to reset password which was created in forgot password api
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(forgotPasswordToken);
+        // setting expiration time in millisecond for the token
         long expirationTime = 120000;
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+        // checking if token exists
         if(token == null)
         {
             return new ResponseEntity("Invalid token",HttpStatus.NOT_FOUND);
@@ -57,18 +76,15 @@ public class ForgotPasswordService {
 
         User registeredUser = userRepository.findByUserId(token.getUser().getId());
 
-        if(registeredUser == null)
-        {
-            return new ResponseEntity("No user found",HttpStatus.NOT_FOUND);
-        }
-
+        // checking if token expired or not
         if((token.getCreatedDate().getTime() + expirationTime) > System.currentTimeMillis())
         {
+            // checking if new password and confirm password is same or not
             if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
             {
-                System.out.println(">>>>>>>>>>>>>>"+token.getCreatedDate().getTime());
                 registeredUser.setPassword(updatePasswordDto.getNewPassword());
                 userRepository.save(registeredUser);
+                // deleting the token from the database
                 confirmationTokenRepository.deleteById(token.getTokenId());
 
                 return new ResponseEntity("Password reset successful!!",HttpStatus.CREATED);
@@ -77,6 +93,7 @@ public class ForgotPasswordService {
             return new ResponseEntity("New password and confirm password should be same.",HttpStatus.BAD_REQUEST);
         }
 
+        // deleting the token if token got expired
         confirmationTokenRepository.deleteById(token.getTokenId());
         return new ResponseEntity("Token expired!!",HttpStatus.BAD_REQUEST);
 

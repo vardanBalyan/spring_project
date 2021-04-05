@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Email;
+
 @RestController
 public class ForgotPasswordController {
 
@@ -13,7 +15,7 @@ public class ForgotPasswordController {
     ForgotPasswordService passwordService;
 
     @PostMapping(path = "/forgot-password/{email}")
-    public ResponseEntity<String> forgotPassword(@PathVariable String email)
+    public ResponseEntity<String> forgotPassword(@PathVariable @Email(message = "not a valid email.") String email)
     {
         return passwordService.forgotPassword(email);
     }

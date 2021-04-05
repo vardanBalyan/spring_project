@@ -49,9 +49,11 @@ public class RegisterUserService {
 
         customerRepository.save(customer);
 
+        // creating new confirmation token
         ConfirmationToken confirmationToken = new ConfirmationToken(customer);
         confirmationTokenRepository.save(confirmationToken);
 
+        // sending the mail to the user to activate account
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(customer.getEmail());
         mailMessage.setSubject("Complete Registration!");
@@ -67,11 +69,15 @@ public class RegisterUserService {
 
     public ResponseEntity<String> confirmCustomer(String confirmationToken)
     {
+        // getting the token from the database
         ConfirmationToken token = confirmationTokenRepository
                 .findByConfirmationToken(confirmationToken);
 
+        // checking if token exist
         if (token != null) {
+            //  getting user from the userid associated with the confirmation token
             User user = userRepository.findByEmail(token.getUser().getEmail());
+            // activating user account
             user.setActive(true);
             userRepository.save(user);
             return new ResponseEntity("Customer activated successfully!!", HttpStatus.CREATED);
@@ -82,8 +88,10 @@ public class RegisterUserService {
     public ResponseEntity<String> resendActivationLink(String email)
     {
         User user = userRepository.findByEmail(email);
+        //
         ConfirmationToken token = confirmationTokenRepository.findByUserId(user.getId());
 
+        // sending mail
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Complete Registration!");
@@ -112,12 +120,14 @@ public class RegisterUserService {
         seller.setCompanyContact(registerSeller.getCompanyContact());
         seller.addAddress(registerSeller.getAddress());
 
+        // setting role for the seller
         Role role = roleRepository.findByAuthority("ROLE_SELLER");
         UserRole roleOfSeller = new UserRole(seller, role);
         seller.addRoles(roleOfSeller);
 
         sellerRepository.save(seller);
 
+        // sending mail for account creation
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(seller.getEmail());
         mailMessage.setSubject("Account created successfully!!");
