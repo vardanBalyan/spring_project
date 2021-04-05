@@ -2,7 +2,9 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.CustomerProfileDto;
 import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
+import com.ttn.bootcampProject.dtos.ViewAllCategoryForCustomer;
 import com.ttn.bootcampProject.entities.Address;
+import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.CustomerDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ public class CustomerController {
 
     @Autowired
     CustomerDaoService customerDaoService;
+    @Autowired
+    CategoryService categoryService;
 
     @GetMapping("/customer/profile")
     public CustomerProfileDto customerProfile(Principal principal) {
@@ -60,6 +64,12 @@ public class CustomerController {
     public ResponseEntity<String> deleteAnAddress(@PathVariable long id, Principal principal)
     {
         return customerDaoService.deleteAnAddress(id, principal.getName());
+    }
+
+    @GetMapping("/customer/category/{id}")
+    public List<ViewAllCategoryForCustomer> viewAllCategory(@PathVariable Long id)
+    {
+        return categoryService.viewCategoryForCustomer(id);
     }
 
 }

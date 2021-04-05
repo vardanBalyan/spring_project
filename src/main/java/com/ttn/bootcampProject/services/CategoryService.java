@@ -2,11 +2,14 @@ package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.dtos.AddCategoryDto;
 import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
+import com.ttn.bootcampProject.dtos.ViewAllCategoryForCustomer;
 import com.ttn.bootcampProject.dtos.ViewAllCategorySeller;
 import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValuesId;
+import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
+import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
 import com.ttn.bootcampProject.repos.CategoryMetadataFieldValuesRepository;
 import com.ttn.bootcampProject.repos.CategoryRepository;
@@ -198,5 +201,59 @@ public class CategoryService {
         }
 
         return categorySellerList;
+    }
+
+
+    public List<ViewAllCategoryForCustomer> viewCategoryForCustomer(Long id)
+    {
+        List<ViewAllCategoryForCustomer> categoryForCustomerList = new ArrayList<>();
+
+        // if id is null then return all parent category
+        if(id == 0)
+        {
+            List<Category> parentCategoryList = categoryRepository.getAllParentCategory();
+
+            for (Category category: parentCategoryList) {
+                ViewAllCategoryForCustomer categoryForCustomer = new ViewAllCategoryForCustomer();
+                categoryForCustomer.setId(category.getId());
+                categoryForCustomer.setName(category.getName());
+                categoryForCustomerList.add(categoryForCustomer);
+            }
+
+            return categoryForCustomerList;
+        }
+
+
+        Category checkCategory = categoryRepository.findById(id);
+
+        // checks if category exist with the id provided
+        if(checkCategory == null)
+        {
+            throw new CategoryNotFoundException("No category found for provided id.");
+        }
+        else
+        {
+            // runs if the category we got is parent of another category
+            if(checkCategory.isHasChild())
+            {
+                List<Category> childCategoryList = categoryRepository.findAllChildForParentId(checkCategory.getId());
+                for (Category category: childCategoryList) {
+                    ViewAllCategoryForCustomer categoryForCustomer = new ViewAllCategoryForCustomer();
+                    categoryForCustomer.setName(category.getName());
+                    categoryForCustomer.setId(category.getId());
+                    categoryForCustomerList.add(categoryForCustomer);
+                }
+            }
+            else
+            {
+                // runs when category we got is leaf category
+                ViewAllCategoryForCustomer categoryForCustomer = new ViewAllCategoryForCustomer();
+                categoryForCustomer.setName(checkCategory.getName());
+                categoryForCustomer.setId(checkCategory.getId());
+                categoryForCustomerList.add(categoryForCustomer);
+            }
+        }
+
+        return categoryForCustomerList;
     }
 }

@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CategoryMetadataFieldsAndValues {
+public class ViewAllCategoryForCustomer {
 
-    private String metadata;
-    private String values;
+    private long id;
+    private String name;
 }

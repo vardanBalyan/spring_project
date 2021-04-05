@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -20,7 +22,10 @@ public class RegisterCustomerDto {
     private String middleName;
     @Size(min = 3, message = "should contain at least {min} characters")
     private String lastName;
-    @ValidPassword
+    @NotNull
+    @Pattern(regexp="((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,15})"
+            ,message="Password must contain 8-15 Characters with atleast 1 Lower case, " +
+            "1 Upper case, 1 Special Character, 1 Number")
     private String password;
     @Size(min = 10, max = 10, message = "should contain at least {min} digits only")
     private String contact;
