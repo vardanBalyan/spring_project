@@ -16,4 +16,7 @@ public interface CategoryRepository extends CrudRepository<Category, Integer> {
 
     @Query(value = "select * from category", nativeQuery = true)
     List<Category> getAllCategories();
+
+    @Query("from Category where hasChild=false")
+    List<Category> getAllLeafCategory();
 }

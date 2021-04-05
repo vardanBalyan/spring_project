@@ -2,6 +2,7 @@ package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.dtos.AddCategoryDto;
 import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
+import com.ttn.bootcampProject.dtos.ViewAllCategorySeller;
 import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
@@ -14,9 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class CategoryService {
@@ -69,7 +68,7 @@ public class CategoryService {
         return null;
     }
 
-    public List<AddCategoryDto> viewAllCategory()
+    public List<AddCategoryDto> viewAllCategoryAdmin()
     {
         List<Category> categoryList = categoryRepository.getAllCategories();
         List<AddCategoryDto> categoryDtoList = new ArrayList<>();
@@ -172,5 +171,32 @@ public class CategoryService {
         metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
         categoryMetadataFieldValuesRepository.save(metadataFieldValues);
         return new ResponseEntity("Values updated successfully.",HttpStatus.ACCEPTED);
+    }
+
+
+    public List<ViewAllCategorySeller> viewAllCategoryForSeller()
+    {
+        List<ViewAllCategorySeller> categorySellerList = new ArrayList<>();
+
+        List<Category> leafCategoryList = categoryRepository.getAllLeafCategory();
+
+        List<CategoryMetadataField> allCategoryMetadata = categoryMetadataFieldRepository.allMetadataFields();
+
+        for (Category leafCategory: leafCategoryList) {
+            ViewAllCategorySeller categorySeller = new ViewAllCategorySeller();
+
+            categorySeller.setCategoryName(leafCategory.getName());
+
+            Map<String, String> metadataAndValuesMap = new HashMap<>();
+
+            for (CategoryMetadataField metadataField: allCategoryMetadata) {
+                metadataAndValuesMap.put(metadataField.getName(), categoryMetadataFieldValuesRepository
+                        .valueByCompositeId(leafCategory.getId(), metadataField.getId()));
+            }
+            categorySeller.setMetadataFieldsAndValues(metadataAndValuesMap);
+            categorySellerList.add(categorySeller);
+        }
+
+        return categorySellerList;
     }
 }

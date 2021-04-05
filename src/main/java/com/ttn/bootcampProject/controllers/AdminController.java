@@ -2,11 +2,9 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.AddCategoryDto;
 import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
-import com.ttn.bootcampProject.emailservices.MailService;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.dtos.GetAllCustomerInfoDto;
 import com.ttn.bootcampProject.dtos.GetAllSellersInfoDto;
-import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
@@ -93,7 +91,7 @@ public class AdminController {
     @GetMapping("/category")
     public List<AddCategoryDto> viewAllCategory()
     {
-        return categoryService.viewAllCategory();
+        return categoryService.viewAllCategoryAdmin();
     }
 
     @PatchMapping("/update-category")
