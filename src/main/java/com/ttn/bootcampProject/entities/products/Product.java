@@ -28,6 +28,10 @@ public class Product {
     @JoinColumn(name = "product_id")
     private List<ProductVariation> productVariationList;
 
+    public Product() {
+        this.isActive = false;
+    }
+
     public void addProductVariations(ProductVariation productVariation)
     {
         if(productVariation != null)

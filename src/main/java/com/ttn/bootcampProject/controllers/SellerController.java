@@ -1,9 +1,8 @@
 package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.dtos.CustomerProfileDto;
 import com.ttn.bootcampProject.dtos.SellerProfileDto;
 import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
-import com.ttn.bootcampProject.dtos.ViewAllCategorySeller;
+import com.ttn.bootcampProject.dtos.DisplayCategoryDto;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.SellerDaoService;
@@ -50,7 +49,7 @@ public class SellerController {
     }
 
     @GetMapping("/seller/category")
-    public List<ViewAllCategorySeller> viewAllCategory()
+    public List<DisplayCategoryDto> viewAllCategory()
     {
         return categoryService.viewAllCategoryForSeller();
     }

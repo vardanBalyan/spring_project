@@ -1,9 +1,6 @@
 package com.ttn.bootcampProject.services;
 
-import com.ttn.bootcampProject.dtos.AddCategoryDto;
-import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
-import com.ttn.bootcampProject.dtos.ViewAllCategoryForCustomer;
-import com.ttn.bootcampProject.dtos.ViewAllCategorySeller;
+import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
@@ -59,40 +56,88 @@ public class CategoryService {
         return new ResponseEntity("Added as new parent category.",HttpStatus.ACCEPTED);
     }
 
-    public AddCategoryDto viewACategory(long id)
+    public AllCategoryInfoDto viewACategory(long id)
     {
         Category category = categoryRepository.findById(id);
 
-        if(category != null)
+        if(category == null)
         {
-            AddCategoryDto categoryDto = new AddCategoryDto();
-            categoryDto.setName(category.getName());
-            categoryDto.setParentId(categoryRepository.findParentIdsByCategoryId(category.getId()));
-            categoryDto.setHasChild(categoryDto.isHasChild());
-            return categoryDto;
+            return null;
         }
 
-        // returns null if category not found for the provided id
-        return null;
+        AllCategoryInfoDto categoryInfoDto = new AllCategoryInfoDto();
+
+        // getting all parent chain details and assigning to dto field
+        categoryInfoDto.setParentChain(getParentChainInfo(categoryRepository.findParentIdByCategoryId(category.getId())));
+
+        categoryInfoDto.setId(category.getId());
+        categoryInfoDto.setCategoryName(category.getName());
+
+        // getting all children of category
+       Set<Category> childCategorySet = category.getCategorySet();
+        // getting all metadata field
+        List<CategoryMetadataField> allCategoryMetadata = categoryMetadataFieldRepository.allMetadataFields();
+        List<DisplayCategoryDto> displayCategoryDtoList = new ArrayList<>();
+
+        // to display information of all children with metadata and values
+        for (Category child: childCategorySet) {
+            DisplayCategoryDto displayCategoryDto = new DisplayCategoryDto();
+
+            displayCategoryDto.setCategoryName(child.getName());
+            displayCategoryDto.setId(child.getId());
+
+            // getting map of Metadata and values for the child
+            displayCategoryDto.setMetadataFieldsAndValues(getMapOfMetadataAndValues(child, allCategoryMetadata));
+
+            displayCategoryDto.setParentChain(getParentChainInfo(categoryRepository.findParentIdByCategoryId(child.getId())));
+            displayCategoryDtoList.add(displayCategoryDto);
+        }
+
+        categoryInfoDto.setChildList(displayCategoryDtoList);
+        return categoryInfoDto;
     }
 
-    public List<AddCategoryDto> viewAllCategoryAdmin()
+    public List<AllCategoryInfoDto> viewAllCategoryAdmin()
     {
-        // gets all categories from the database
-        List<Category> categoryList = categoryRepository.getAllCategories();
-        List<AddCategoryDto> categoryDtoList = new ArrayList<>();
+        List<AllCategoryInfoDto> allCategoryInfoDtoList = new ArrayList<>();
+        List<Category> allCategories = categoryRepository.getAllCategories();
 
-        // assigning categories to the List of AddCategoryDto
-        for (Category category:categoryList) {
-            AddCategoryDto categoryDto = new AddCategoryDto();
-            categoryDto.setId(category.getId());
-            categoryDto.setName(category.getName());
-            categoryDto.setParentId(categoryRepository.findParentIdsByCategoryId(category.getId()));
-            categoryDto.setHasChild(category.isHasChild());
-            categoryDtoList.add(categoryDto);
+        for (Category category: allCategories) {
+            AllCategoryInfoDto categoryInfoDto = new AllCategoryInfoDto();
+
+            // getting all parent chain details and assigning to dto field
+            categoryInfoDto.setParentChain(getParentChainInfo(categoryRepository.findParentIdByCategoryId(category.getId())));
+
+            categoryInfoDto.setId(category.getId());
+            categoryInfoDto.setCategoryName(category.getName());
+
+            // getting all children of category
+            Set<Category> childCategorySet = category.getCategorySet();
+            // getting all metadata field
+            List<CategoryMetadataField> allCategoryMetadata = categoryMetadataFieldRepository.allMetadataFields();
+            List<DisplayCategoryDto> displayCategoryDtoList = new ArrayList<>();
+
+            // to display information of all children with metadata and values
+            for (Category child: childCategorySet) {
+                DisplayCategoryDto displayCategoryDto = new DisplayCategoryDto();
+
+                displayCategoryDto.setCategoryName(child.getName());
+                displayCategoryDto.setId(child.getId());
+
+                // getting map of Metadata and values for the child
+                displayCategoryDto.setMetadataFieldsAndValues(getMapOfMetadataAndValues(child, allCategoryMetadata));
+
+                displayCategoryDto.setParentChain(getParentChainInfo(categoryRepository.findParentIdByCategoryId(child.getId())));
+                displayCategoryDtoList.add(displayCategoryDto);
+            }
+
+            categoryInfoDto.setChildList(displayCategoryDtoList);
+            allCategoryInfoDtoList.add(categoryInfoDto);
         }
-        return categoryDtoList;
+
+        return allCategoryInfoDtoList;
     }
+
 
     public ResponseEntity<String> updateCategory(AddCategoryDto categoryDto)
     {
@@ -204,9 +249,9 @@ public class CategoryService {
     }
 
 
-    public List<ViewAllCategorySeller> viewAllCategoryForSeller()
+    public List<DisplayCategoryDto> viewAllCategoryForSeller()
     {
-        List<ViewAllCategorySeller> categorySellerList = new ArrayList<>();
+        List<DisplayCategoryDto> displayCategoryDtoList = new ArrayList<>();
 
         // getting all leaf node categories
         List<Category> leafCategoryList = categoryRepository.getAllLeafCategory();
@@ -215,28 +260,25 @@ public class CategoryService {
         List<CategoryMetadataField> allCategoryMetadata = categoryMetadataFieldRepository.allMetadataFields();
 
         for (Category leafCategory: leafCategoryList) {
-            ViewAllCategorySeller categorySeller = new ViewAllCategorySeller();
+            DisplayCategoryDto displayCategoryDto = new DisplayCategoryDto();
 
-            categorySeller.setCategoryName(leafCategory.getName());
+            displayCategoryDto.setCategoryName(leafCategory.getName());
+            displayCategoryDto.setId(leafCategory.getId());
 
-            Map<String, String> metadataAndValuesMap = new HashMap<>();
+            displayCategoryDto.setMetadataFieldsAndValues(getMapOfMetadataAndValues(leafCategory, allCategoryMetadata));
 
-            // assigning metadata and metadata values for the particular leaf node category
-            for (CategoryMetadataField metadataField: allCategoryMetadata) {
-                metadataAndValuesMap.put(metadataField.getName(), categoryMetadataFieldValuesRepository
-                        .valueByCompositeId(leafCategory.getId(), metadataField.getId()));
-            }
-            categorySeller.setMetadataFieldsAndValues(metadataAndValuesMap);
-            categorySellerList.add(categorySeller);
+
+            displayCategoryDto.setParentChain(getParentChainInfo(categoryRepository.findParentIdByCategoryId(leafCategory.getId())));
+            displayCategoryDtoList.add(displayCategoryDto);
         }
 
-        return categorySellerList;
+        return displayCategoryDtoList;
     }
 
 
-    public List<ViewAllCategoryForCustomer> viewCategoryForCustomer(Long id)
+    public List<ViewAllCategoryForCustomerDto> viewCategoryForCustomer(Long id)
     {
-        List<ViewAllCategoryForCustomer> categoryForCustomerList = new ArrayList<>();
+        List<ViewAllCategoryForCustomerDto> categoryForCustomerList = new ArrayList<>();
 
         // if id is null then return all parent category
         if(id == 0)
@@ -244,7 +286,7 @@ public class CategoryService {
             List<Category> parentCategoryList = categoryRepository.getAllParentCategory();
 
             for (Category category: parentCategoryList) {
-                ViewAllCategoryForCustomer categoryForCustomer = new ViewAllCategoryForCustomer();
+                ViewAllCategoryForCustomerDto categoryForCustomer = new ViewAllCategoryForCustomerDto();
                 categoryForCustomer.setId(category.getId());
                 categoryForCustomer.setName(category.getName());
                 categoryForCustomerList.add(categoryForCustomer);
@@ -254,21 +296,21 @@ public class CategoryService {
         }
 
 
-        Category checkCategory = categoryRepository.findById(id);
+        Category fetchedCategory = categoryRepository.findById(id);
 
         // checks if category exist with the id provided
-        if(checkCategory == null)
+        if(fetchedCategory == null)
         {
             throw new CategoryNotFoundException("No category found for provided id.");
         }
         else
         {
             // runs if the category we got is parent of another category
-            if(checkCategory.isHasChild())
+            if(fetchedCategory.isHasChild())
             {
-                List<Category> childCategoryList = categoryRepository.findAllChildForParentId(checkCategory.getId());
+                List<Category> childCategoryList = categoryRepository.findAllChildForParentId(fetchedCategory.getId());
                 for (Category category: childCategoryList) {
-                    ViewAllCategoryForCustomer categoryForCustomer = new ViewAllCategoryForCustomer();
+                    ViewAllCategoryForCustomerDto categoryForCustomer = new ViewAllCategoryForCustomerDto();
                     categoryForCustomer.setName(category.getName());
                     categoryForCustomer.setId(category.getId());
                     categoryForCustomerList.add(categoryForCustomer);
@@ -277,13 +319,56 @@ public class CategoryService {
             else
             {
                 // runs when category we got is leaf category
-                ViewAllCategoryForCustomer categoryForCustomer = new ViewAllCategoryForCustomer();
-                categoryForCustomer.setName(checkCategory.getName());
-                categoryForCustomer.setId(checkCategory.getId());
+                ViewAllCategoryForCustomerDto categoryForCustomer = new ViewAllCategoryForCustomerDto();
+                categoryForCustomer.setName(fetchedCategory.getName());
+                categoryForCustomer.setId(fetchedCategory.getId());
                 categoryForCustomerList.add(categoryForCustomer);
             }
         }
 
         return categoryForCustomerList;
+    }
+
+
+    private String getParentChainInfo(Long parentId)
+    {
+        List<String> parentChainList = new ArrayList<>();
+
+        // running while loop till we get parent id as null to reach root parent node
+        while (parentId != null)
+        {
+            // getting parent of each child in hierarchy
+            Category immediateParent = categoryRepository.findById(parentId);
+            // adding the parent category names to the list
+            parentChainList.add(immediateParent.getName());
+            parentId = categoryRepository.findParentIdByCategoryId(immediateParent.getId());
+        }
+
+        Collections.reverse(parentChainList);
+
+        // using string builder to append the names of all parent into single string
+        StringBuilder parentChain = new StringBuilder();
+
+        for (String parent: parentChainList) {
+            // appending names to string builder
+            parentChain.append(parent);
+            parentChain.append(" > ");
+        }
+
+        return parentChain.toString();
+    }
+
+
+    private Map<String,String> getMapOfMetadataAndValues(Category category, List<CategoryMetadataField> metadataFieldList)
+    {
+        Map<String, String> metadataAndValuesMap = new HashMap<>();
+
+        // assigning metadata and metadata values for the particular category
+        for (CategoryMetadataField metadataField : metadataFieldList) {
+            metadataAndValuesMap.put(metadataField.getName(), categoryMetadataFieldValuesRepository
+                    .valueByCompositeId(category.getId(), metadataField.getId()));
+        }
+
+        return metadataAndValuesMap;
     }
 }

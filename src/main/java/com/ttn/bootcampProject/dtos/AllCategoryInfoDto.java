@@ -8,8 +8,10 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class ViewAllCategorySeller {
+public class AllCategoryInfoDto {
 
+    private long id;
     private String categoryName;
-    private Map<String,String> metadataFieldsAndValues;
+    private String parentChain;
+    private List<DisplayCategoryDto> childList;
 }

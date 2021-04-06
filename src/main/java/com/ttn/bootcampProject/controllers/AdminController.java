@@ -1,13 +1,9 @@
 package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.dtos.AddCategoryDto;
-import com.ttn.bootcampProject.dtos.CategoryMetadataFieldValuesDto;
+import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.User;
-import com.ttn.bootcampProject.dtos.GetAllCustomerInfoDto;
-import com.ttn.bootcampProject.dtos.GetAllSellersInfoDto;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
-import com.ttn.bootcampProject.exceptions.UserNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.UserDaoService;
 import org.slf4j.Logger;
@@ -80,9 +76,9 @@ public class AdminController {
     }
 
     @GetMapping("/category/{id}")
-    public AddCategoryDto viewACategory(@PathVariable long id)
+    public AllCategoryInfoDto viewACategory(@PathVariable long id)
     {
-        AddCategoryDto categoryDto = categoryService.viewACategory(id);
+        AllCategoryInfoDto categoryDto = categoryService.viewACategory(id);
         if(categoryDto == null)
         {
             throw new CategoryNotFoundException("No category found for the specified category id.");
@@ -91,7 +87,7 @@ public class AdminController {
     }
 
     @GetMapping("/category")
-    public List<AddCategoryDto> viewAllCategory()
+    public List<AllCategoryInfoDto> viewAllCategory()
     {
         return categoryService.viewAllCategoryAdmin();
     }

@@ -2,7 +2,7 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.CustomerProfileDto;
 import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
-import com.ttn.bootcampProject.dtos.ViewAllCategoryForCustomer;
+import com.ttn.bootcampProject.dtos.ViewAllCategoryForCustomerDto;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.CustomerDaoService;
@@ -67,7 +67,7 @@ public class CustomerController {
     }
 
     @GetMapping("/customer/category/{id}")
-    public List<ViewAllCategoryForCustomer> viewAllCategory(@PathVariable Long id)
+    public List<ViewAllCategoryForCustomerDto> viewAllCategory(@PathVariable Long id)
     {
         return categoryService.viewCategoryForCustomer(id);
     }

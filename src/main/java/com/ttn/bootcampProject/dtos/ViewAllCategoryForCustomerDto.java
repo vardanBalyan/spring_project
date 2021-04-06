@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ViewAllCategoryForCustomer {
+public class ViewAllCategoryForCustomerDto {
 
     private long id;
     private String name;
