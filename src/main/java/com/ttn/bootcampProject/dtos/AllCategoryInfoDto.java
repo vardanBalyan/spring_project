@@ -13,5 +13,5 @@ public class AllCategoryInfoDto {
     private long id;
     private String categoryName;
     private String parentChain;
-    private List<DisplayCategoryDto> childList;
+    private List<DisplayCategoryDto> immediateChildList;
 }

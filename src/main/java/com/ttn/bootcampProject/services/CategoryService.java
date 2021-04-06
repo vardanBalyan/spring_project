@@ -93,7 +93,7 @@ public class CategoryService {
             displayCategoryDtoList.add(displayCategoryDto);
         }
 
-        categoryInfoDto.setChildList(displayCategoryDtoList);
+        categoryInfoDto.setImmediateChildList(displayCategoryDtoList);
         return categoryInfoDto;
     }
 
@@ -131,7 +131,7 @@ public class CategoryService {
                 displayCategoryDtoList.add(displayCategoryDto);
             }
 
-            categoryInfoDto.setChildList(displayCategoryDtoList);
+            categoryInfoDto.setImmediateChildList(displayCategoryDtoList);
             allCategoryInfoDtoList.add(categoryInfoDto);
         }
 

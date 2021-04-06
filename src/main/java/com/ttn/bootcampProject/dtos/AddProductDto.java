@@ -17,6 +17,6 @@ public class AddProductDto {
     @NotNull
     private long categoryId;
     private String description;
-    private boolean isCancellable = false;
-    private boolean isReturnable = false;
+    private boolean cancellable;
+    private boolean returnable;
 }

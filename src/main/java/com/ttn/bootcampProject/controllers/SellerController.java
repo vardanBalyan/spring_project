@@ -1,10 +1,12 @@
 package com.ttn.bootcampProject.controllers;
 
+import com.ttn.bootcampProject.dtos.AddProductDto;
 import com.ttn.bootcampProject.dtos.SellerProfileDto;
 import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
 import com.ttn.bootcampProject.dtos.DisplayCategoryDto;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.services.CategoryService;
+import com.ttn.bootcampProject.services.ProductService;
 import com.ttn.bootcampProject.services.SellerDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ public class SellerController {
     SellerDaoService sellerDaoService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ProductService productService;
 
     @GetMapping("/seller/profile")
     public SellerProfileDto customerProfile(Principal principal) {
@@ -52,5 +56,11 @@ public class SellerController {
     public List<DisplayCategoryDto> viewAllCategory()
     {
         return categoryService.viewAllCategoryForSeller();
+    }
+
+    @PostMapping("/seller/add-product")
+    public ResponseEntity<String> addAProduct(@RequestBody AddProductDto addProductDto, Principal principal)
+    {
+        return productService.addAProduct(addProductDto, principal.getName());
     }
 }

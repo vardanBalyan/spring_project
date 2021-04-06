@@ -11,4 +11,9 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     @Query("select name from Product where brand=:brandName")
     List<String> allProductNamesForABrandName(@Param("brandName") String brandName);
+
+    @Query(value = "select * from product where seller_user_id=:sellerId AND category_id=:categoryId " +
+            "AND brand=:brandName AND name=:productName", nativeQuery = true)
+    Product getProductByCombination(@Param("sellerId") long sellerId, @Param("categoryId") long categoryId
+            ,@Param("brandName") String brandName, @Param("productName") String productName);
 }
