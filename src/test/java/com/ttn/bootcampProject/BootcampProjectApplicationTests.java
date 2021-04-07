@@ -284,11 +284,17 @@ class BootcampProjectApplicationTests {
 	public void testProductVariation()
 	{
 		ProductVariation p = new ProductVariation();
+		String s1="color";
+		String s2="black";
+		String s3="type";
+		String s4="sport";
 		p.setActive(false);
 		p.setPrice(5632.4);
 		p.setPrimaryImageName("hello");
 		p.setQuantityAvailable(7);
-		p.setMetadata("{ \"color\" : \"black\", \"type\" : \"sports\" }");
+		//p.setMetadata();
+
+		//p.setMetadata("{ \"color\" : \"black\", \"type\" : \"sports\" }");
 		productVariationRepository.save(p);
 	}
 

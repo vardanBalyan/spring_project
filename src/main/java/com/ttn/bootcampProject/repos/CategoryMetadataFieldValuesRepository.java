@@ -13,5 +13,5 @@ public interface CategoryMetadataFieldValuesRepository extends CrudRepository<Ca
     CategoryMetadataFieldValues findByMetadataCompositeId(@Param("cid") long categoryId, @Param("mid") long metadataId);
 
     @Query("select value from CategoryMetadataFieldValues where id.categoryId=:cid AND id.categoryMetadataFieldId=:mid")
-    String valueByCompositeId(@Param("cid") long categoryId, @Param("mid") long metadataId);
+    String findValueByCompositeId(@Param("cid") long categoryId, @Param("mid") long metadataId);
 }

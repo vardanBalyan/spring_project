@@ -87,4 +87,16 @@ public class SellerController {
     {
         return productService.deleteAProduct(id, principal.getName());
     }
+
+    @PatchMapping("/seller/update-product/{id}")
+    public ResponseEntity<String> updateProduct(@Valid @RequestBody AddProductDto updateProduct, @PathVariable long id, Principal principal)
+    {
+        return productService.updateProduct(updateProduct,id, principal.getName());
+    }
+
+    @PostMapping("/seller/add-product-variation")
+    public ResponseEntity<String> addProductVariation(@Valid @RequestBody AddProductVariationDto addProductVariationDto, Principal principal)
+    {
+        return productService.addAProductVariation(addProductVariationDto, principal.getName());
+    }
  }

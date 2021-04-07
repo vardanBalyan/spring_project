@@ -366,7 +366,7 @@ public class CategoryService {
         // assigning metadata and metadata values for the particular category
         for (CategoryMetadataField metadataField : metadataFieldList) {
             metadataAndValuesMap.put(metadataField.getName(), categoryMetadataFieldValuesRepository
-                    .valueByCompositeId(category.getId(), metadataField.getId()));
+                    .findValueByCompositeId(category.getId(), metadataField.getId()));
         }
 
         return metadataAndValuesMap;
