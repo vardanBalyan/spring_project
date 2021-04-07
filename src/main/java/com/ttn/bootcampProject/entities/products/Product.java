@@ -20,7 +20,7 @@ public class Product {
     private String brand;
     private boolean isReturnable;
     private boolean isActive;
-
+    private boolean isDeleted;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
     private List<ProductReview> productReviews;
 
@@ -30,6 +30,7 @@ public class Product {
 
     public Product() {
         this.isActive = false;
+        this.isDeleted = false;
     }
 
     public void addProductVariations(ProductVariation productVariation)
