@@ -3,11 +3,14 @@ package com.ttn.bootcampProject.services;
 import com.ttn.bootcampProject.dtos.AddProductDto;
 import com.ttn.bootcampProject.dtos.AddProductVariationDto;
 import com.ttn.bootcampProject.dtos.DisplayProductDto;
+import com.ttn.bootcampProject.dtos.DisplayProductVariationDto;
 import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.products.Product;
 import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.entities.products.categories.Category;
+import com.ttn.bootcampProject.exceptions.ProductNotFoundException;
+import com.ttn.bootcampProject.exceptions.ProductVariationNotFoundException;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -232,7 +235,7 @@ public class ProductService {
 
         if(!product.isActive())
         {
-            return new ResponseEntity("Either product is not active or product not found",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Product is not active.",HttpStatus.BAD_REQUEST);
         }
 
         // getting the category id to use in metadata validation
@@ -254,7 +257,7 @@ public class ProductService {
             // getting the corresponding values of metadata field and category
             String values = categoryMetadataFieldValuesRepository.findValueByCompositeId(categoryId, metadataFieldId);
 
-            // spliting the string since all values are stored as single string separated by commas
+            // split the string since all values are stored as single string separated by commas
             // and storing in string array
             String[] valuesArray = values.split(",");
 
@@ -284,4 +287,179 @@ public class ProductService {
 
         return new ResponseEntity("New product variation created.",HttpStatus.CREATED);
     }
+
+
+    public DisplayProductVariationDto viewAProductVariation(long id, String email)
+    {
+        ProductVariation productVariation = productVariationRepository.findById(id);
+
+        if(productVariation == null)
+        {
+            throw new ProductVariationNotFoundException("No product variation found with for the provided id.");
+        }
+        // finding user by email getting from principal
+        User user = userRepository.findByEmail(email);
+        // finding the seller from user id we got from email
+        Seller seller = sellerRepository.findSellerByUserId(user.getId());
+
+        List<Long> allProductIdsOfLoggedInSeller = productRepository.getAllProductIdsForSellerId(seller.getId());
+
+        Product product = productRepository.findById(productVariationRepository.getProductIdForVariationId(id));
+
+        if(!allProductIdsOfLoggedInSeller.contains(product.getId()) || product.isDeleted())
+        {
+            throw new ProductNotFoundException("Particular product variation not found for your products.");
+        }
+
+        Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+
+        DisplayProductVariationDto displayProductVariationDto = new DisplayProductVariationDto();
+        DisplayProductDto displayProductDto = new DisplayProductDto();
+
+        displayProductDto.setCategoryId(productCategory.getId());
+        displayProductDto.setCategoryName(product.getName());
+        displayProductDto.setActive(product.isActive());
+        displayProductDto.setReturnable(product.isReturnable());
+        displayProductDto.setCancellable(product.isCancellable());
+        displayProductDto.setName(product.getName());
+        displayProductDto.setBrand(product.getBrand());
+        displayProductDto.setDescription(product.getDescription());
+        displayProductDto.setId(product.getId());
+
+        displayProductVariationDto.setProduct(displayProductDto);
+
+        displayProductVariationDto.setId(productVariation.getId());
+        displayProductVariationDto.setPrice(productVariation.getPrice());
+        displayProductVariationDto.setActive(productVariation.isActive());
+        displayProductVariationDto.setPrimaryImageName(productVariation.getPrimaryImageName());
+        displayProductVariationDto.setQuantityAvailable(productVariation.getQuantityAvailable());
+        displayProductVariationDto.setMetadata(productVariation.getMetadata());
+
+        return displayProductVariationDto;
+    }
+
+    public List<DisplayProductVariationDto> viewAllProductVariation(String email)
+    {
+        // finding user by email getting from principal
+        User user = userRepository.findByEmail(email);
+        // finding the seller from user id we got from email
+        Seller seller = sellerRepository.findSellerByUserId(user.getId());
+
+        List<DisplayProductVariationDto> displayProductVariationDtoList = new ArrayList<>();
+        List<Product> allProductOfSeller = productRepository.getAllProductsOfSeller(seller.getId());
+
+        for (Product product: allProductOfSeller) {
+
+            List<ProductVariation> productVariations = productVariationRepository.getAllProductVariationForProductId(product.getId());
+
+            for (ProductVariation productVariation: productVariations) {
+
+                Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+
+                DisplayProductVariationDto displayProductVariationDto = new DisplayProductVariationDto();
+                DisplayProductDto displayProductDto = new DisplayProductDto();
+
+                displayProductDto.setCategoryId(productCategory.getId());
+                displayProductDto.setCategoryName(product.getName());
+                displayProductDto.setActive(product.isActive());
+                displayProductDto.setReturnable(product.isReturnable());
+                displayProductDto.setCancellable(product.isCancellable());
+                displayProductDto.setName(product.getName());
+                displayProductDto.setBrand(product.getBrand());
+                displayProductDto.setDescription(product.getDescription());
+                displayProductDto.setId(product.getId());
+
+                displayProductVariationDto.setProduct(displayProductDto);
+
+                displayProductVariationDto.setId(productVariation.getId());
+                displayProductVariationDto.setPrice(productVariation.getPrice());
+                displayProductVariationDto.setActive(productVariation.isActive());
+                displayProductVariationDto.setPrimaryImageName(productVariation.getPrimaryImageName());
+                displayProductVariationDto.setQuantityAvailable(productVariation.getQuantityAvailable());
+                displayProductVariationDto.setMetadata(productVariation.getMetadata());
+
+                displayProductVariationDtoList.add(displayProductVariationDto);
+            }
+
+        }
+        return displayProductVariationDtoList;
+    }
+
+
+    public ResponseEntity<String> updateProductVariation(AddProductVariationDto addProductVariationDto, String email, long id)
+    {
+
+        ProductVariation productVariation = productVariationRepository.findById(id);
+
+        if(productVariation == null)
+        {
+            throw new ProductVariationNotFoundException("No product variation found with for the provided id.");
+        }
+        // finding user by email getting from principal
+        User user = userRepository.findByEmail(email);
+        // finding the seller from user id we got from email
+        Seller seller = sellerRepository.findSellerByUserId(user.getId());
+
+        List<Long> allProductIdsOfLoggedInSeller = productRepository.getAllProductIdsForSellerId(seller.getId());
+
+        Product product = productRepository.findById(addProductVariationDto.getProductId());
+
+        System.out.println(">>>>>>"+addProductVariationDto.getProductId());
+        System.out.println(">>>>>>>>>"+allProductIdsOfLoggedInSeller);
+        if(!allProductIdsOfLoggedInSeller.contains(addProductVariationDto.getProductId()) || product.isDeleted())
+        {
+            return new ResponseEntity("No product found with particular product id.",HttpStatus.NOT_FOUND);
+        }
+
+
+//        if(!product.isActive())
+//        {
+//            return new ResponseEntity("Product is not active.",HttpStatus.BAD_REQUEST);
+//        }
+
+        // getting the category id to use in metadata validation
+        long categoryId = productRepository.getCategoryIdForAProductId(product.getId());
+
+
+        // metadata map validation
+        for (Map.Entry<String,String> pair: addProductVariationDto.getMetadata().entrySet()) {
+
+            // getting metadata field id using the name of field
+            Long metadataFieldId = categoryMetadataFieldRepository.findIdByName(pair.getKey());
+
+            // validating metadata field name
+            if(metadataFieldId == null)
+            {
+                return new ResponseEntity("No field exist with name as "+pair.getKey(),HttpStatus.BAD_REQUEST);
+            }
+
+            // getting the corresponding values of metadata field and category
+            String values = categoryMetadataFieldValuesRepository.findValueByCompositeId(categoryId, metadataFieldId);
+
+            // split the string since all values are stored as single string separated by commas
+            // and storing in string array
+            String[] valuesArray = values.split(",");
+
+            List<String> valuesFetchedFromArray = new ArrayList<>();
+
+            // converting the string array to a arraylist so i can use the contains() method
+            valuesFetchedFromArray.addAll(Arrays.asList(valuesArray));
+
+            // validating the entered field value
+            if(!valuesFetchedFromArray.contains(pair.getValue()))
+            {
+                return new ResponseEntity("Invalid field value "+pair.getValue(),HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        productVariation.setPrice(addProductVariationDto.getPrice());
+        productVariation.setQuantityAvailable(addProductVariationDto.getQuantity());
+        productVariation.setPrimaryImageName(addProductVariationDto.getPrimaryImageName());
+        productVariation.setMetadata(addProductVariationDto.getMetadata());
+
+        productVariationRepository.save(productVariation);
+
+        return new ResponseEntity("Product updated successfully.",HttpStatus.CREATED);
+    }
+
 }

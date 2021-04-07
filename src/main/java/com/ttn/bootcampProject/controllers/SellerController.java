@@ -99,4 +99,22 @@ public class SellerController {
     {
         return productService.addAProductVariation(addProductVariationDto, principal.getName());
     }
+
+    @GetMapping("/seller/product-variation/{id}")
+    public DisplayProductVariationDto viewAProductVariation(@PathVariable long id, Principal principal)
+    {
+        return productService.viewAProductVariation(id, principal.getName());
+    }
+
+    @GetMapping("/seller/product-variation")
+    public List<DisplayProductVariationDto> viewAllProductVariation(Principal principal)
+    {
+        return productService.viewAllProductVariation(principal.getName());
+    }
+
+    @PatchMapping("/seller/update-product-variation/{id}")
+    public ResponseEntity<String> updateProduct(@RequestBody AddProductVariationDto addProductVariationDto, @PathVariable long id, Principal principal)
+    {
+        return productService.updateProductVariation(addProductVariationDto, principal.getName(), id);
+    }
  }
