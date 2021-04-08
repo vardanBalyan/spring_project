@@ -28,4 +28,7 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     @Query(value = "select * from product where seller_user_id=:id AND is_deleted=false",nativeQuery = true)
     List<Product> getAllProductsOfSeller(@Param("id") long sellerId);
+
+    @Query("from Product where isDeleted=false")
+    List<Product> findAllNonDeletedProducts();
 }

@@ -79,6 +79,7 @@ public class RegisterUserService {
             User user = userRepository.findByEmail(token.getUser().getEmail());
             // activating user account
             user.setActive(true);
+            confirmationTokenRepository.deleteById(token.getTokenId());
             userRepository.save(user);
             return new ResponseEntity("Customer activated successfully!!", HttpStatus.CREATED);
         }

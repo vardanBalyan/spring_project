@@ -65,7 +65,7 @@ public class ForgotPasswordService {
         // getting the token to reset password which was created in forgot password api
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(forgotPasswordToken);
         // setting expiration time in millisecond for the token
-        long expirationTime = 120000;
+        long expirationTime = 300000;
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         // checking if token exists

@@ -5,6 +5,7 @@ import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
+import com.ttn.bootcampProject.services.ProductService;
 import com.ttn.bootcampProject.services.UserDaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ public class AdminController {
     UserDaoService userService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ProductService productService;
 
     @GetMapping(path = "/customers")
     public List<GetAllCustomerInfoDto> listAllCustomers()
@@ -122,4 +125,27 @@ public class AdminController {
         return categoryService.updateCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
     }
 
+    @PatchMapping("/deactivate-product/{id}")
+    public ResponseEntity<String> deactivateAProduct(@PathVariable long id)
+    {
+        return productService.deactivateAProduct(id);
+    }
+
+    @PatchMapping("/activate-product/{id}")
+    public ResponseEntity<String> activateAProduct(@PathVariable long id)
+    {
+        return productService.activateAProduct(id);
+    }
+
+    @GetMapping("/product/{id}")
+    public ProductWithVariationImageDto viewAProduct(@PathVariable long id)
+    {
+        return productService.viewAProductForAdmin(id);
+    }
+
+    @GetMapping("/product")
+    public List<ProductWithVariationImageDto> viewAllProduct()
+    {
+        return productService.viewAllProductForAdmin();
+    }
 }

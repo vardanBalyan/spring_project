@@ -23,13 +23,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     @Column(unique = true)
-   // @Email
     private String email;
-   // @Size(min = 3)
     private String firstName;
-    //@Size(min = 3)
     private String middleName;
-    //@Size(min = 3)
     private String lastName;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;

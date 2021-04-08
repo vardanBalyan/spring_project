@@ -1,9 +1,6 @@
 package com.ttn.bootcampProject.services;
 
-import com.ttn.bootcampProject.dtos.AddProductDto;
-import com.ttn.bootcampProject.dtos.AddProductVariationDto;
-import com.ttn.bootcampProject.dtos.DisplayProductDto;
-import com.ttn.bootcampProject.dtos.DisplayProductVariationDto;
+import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.products.Product;
@@ -18,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class ProductService {
@@ -462,4 +456,115 @@ public class ProductService {
         return new ResponseEntity("Product updated successfully.",HttpStatus.CREATED);
     }
 
+    public ResponseEntity<String> activateAProduct(long id)
+    {
+        Product product = productRepository.findById(id);
+
+        if(product == null)
+        {
+            return new ResponseEntity("No product found for the provided product id.",HttpStatus.BAD_REQUEST);
+        }
+
+        if(product.isActive())
+        {
+            return new ResponseEntity("Product is already active.",HttpStatus.BAD_REQUEST);
+        }
+
+        product.setActive(true);
+        productRepository.save(product);
+
+        return new ResponseEntity("Product is now active.",HttpStatus.ACCEPTED);
+    }
+
+    public ResponseEntity<String> deactivateAProduct(long id)
+    {
+        Product product = productRepository.findById(id);
+
+        if(product == null)
+        {
+            return new ResponseEntity("No product found for the provided product id.",HttpStatus.BAD_REQUEST);
+        }
+
+        if(!product.isActive())
+        {
+            return new ResponseEntity("Product is already de-active.",HttpStatus.BAD_REQUEST);
+        }
+
+        product.setActive(false);
+        productRepository.save(product);
+
+        return new ResponseEntity("Product is now de-active.",HttpStatus.ACCEPTED);
+    }
+
+
+    public ProductWithVariationImageDto viewAProductForAdmin(long id)
+    {
+        Product product = productRepository.findById(id);
+
+        if(product == null)
+        {
+            throw new ProductNotFoundException("No product found for the provided product id.");
+        }
+
+        if(product.isDeleted())
+        {
+            throw new ProductNotFoundException("No product found for the provided product id.");
+        }
+
+        Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+        List<ProductVariation> productVariations = productVariationRepository.getAllProductVariationForProductId(product.getId());
+
+        ProductWithVariationImageDto productWithVariationImageDto= new ProductWithVariationImageDto();
+        productWithVariationImageDto.setId(product.getId());
+        productWithVariationImageDto.setName(product.getName());
+        productWithVariationImageDto.setBrand(product.getBrand());
+        productWithVariationImageDto.setDescription(product.getDescription());
+        productWithVariationImageDto.setActive(product.isActive());
+        productWithVariationImageDto.setCancellable(product.isCancellable());
+        productWithVariationImageDto.setReturnable(product.isReturnable());
+        productWithVariationImageDto.setCategoryId(productCategory.getId());
+        productWithVariationImageDto.setCategoryName(productCategory.getName());
+
+        Map<Long,String> productVariationImages = new HashMap<>();
+
+        for (ProductVariation variation : productVariations) {
+            productVariationImages.put(variation.getId(), variation.getPrimaryImageName());
+        }
+        productWithVariationImageDto.setImageMap(productVariationImages);
+
+        return productWithVariationImageDto;
+    }
+
+
+    public List<ProductWithVariationImageDto> viewAllProductForAdmin()
+    {
+        List<ProductWithVariationImageDto> productWithVariationImageDtoList = new ArrayList<>();
+        List<Product> productList = productRepository.findAllNonDeletedProducts();
+
+        for (Product product: productList) {
+            Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+            List<ProductVariation> productVariations = productVariationRepository.getAllProductVariationForProductId(product.getId());
+
+            ProductWithVariationImageDto productWithVariationImageDto= new ProductWithVariationImageDto();
+            productWithVariationImageDto.setId(product.getId());
+            productWithVariationImageDto.setName(product.getName());
+            productWithVariationImageDto.setBrand(product.getBrand());
+            productWithVariationImageDto.setDescription(product.getDescription());
+            productWithVariationImageDto.setActive(product.isActive());
+            productWithVariationImageDto.setCancellable(product.isCancellable());
+            productWithVariationImageDto.setReturnable(product.isReturnable());
+            productWithVariationImageDto.setCategoryId(productCategory.getId());
+            productWithVariationImageDto.setCategoryName(productCategory.getName());
+
+            Map<Long,String> productVariationImages = new HashMap<>();
+
+            for (ProductVariation variation : productVariations) {
+                productVariationImages.put(variation.getId(), variation.getPrimaryImageName());
+            }
+            productWithVariationImageDto.setImageMap(productVariationImages);
+            productWithVariationImageDtoList.add(productWithVariationImageDto);
+        }
+
+        return productWithVariationImageDtoList;
+    }
 }

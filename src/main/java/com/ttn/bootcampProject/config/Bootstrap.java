@@ -26,86 +26,86 @@ public class Bootstrap implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
-        Role adminRole = new Role();
-        adminRole.setAuthority("ROLE_ADMIN");
-        Role sellerRole = new Role();
-        sellerRole.setAuthority("ROLE_SELLER");
-        Role customerRole = new Role();
-        customerRole.setAuthority("ROLE_CUSTOMER");
-
-        if(userRepository.count()<1){
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-            Admin admin = new Admin();
-            admin.setFirstName("admin");
-            admin.setDeleted(false);
-            admin.setEmail("admin");
-            admin.setPassword(passwordEncoder.encode("admin"));
-            admin.setActive(true);
-            admin.setContact("4666762");
-
-            UserRole roleOfAdmin = new UserRole(admin,adminRole);
-            admin.addRoles(roleOfAdmin);
-
-            Customer customer = new Customer();
-            customer.setFirstName("Vardan");
-            customer.setLastName("Balyan");
-            customer.setContact("5735677");
-            customer.setDeleted(false);
-            customer.setEmail("vardan.balyan@tothenew.com");
-            customer.setPassword(passwordEncoder.encode("pass"));
-            customer.setActive(true);
-
-            Address address = new Address();
-            address.setZipCode("110099");
-            address.setLabel("home");
-            address.setCountry("india");
-            address.setState("delhi");
-            address.setCity("new delhi");
-            address.setAddressLine("212 Sadar bazar");
-
-            List<Address> addresses = new ArrayList<>();
-            addresses.add(address);
-            customer.setAddresses(addresses);
-
-            UserRole roleOfCustomer = new UserRole(customer, customerRole);
-            customer.addRoles(roleOfCustomer);
-
-            Seller seller = new Seller();
-            seller.setFirstName("Rohit");
-            seller.setMiddleName("Kumar");
-            seller.setLastName("Singh");
-            seller.setDeleted(false);
-            seller.setActive(true);
-            seller.setEmail("rohit@gmail.com");
-            seller.setPassword(passwordEncoder.encode("rohit"));
-            seller.setGst("452452gg6327");
-            seller.setCompanyContact("6746276223");
-            seller.setCompanyName("Rohit Garments");
-
-            Address address2 = new Address();
-            address2.setZipCode("110015");
-            address2.setLabel("home");
-            address2.setCountry("india");
-            address2.setState("delhi");
-            address2.setCity("new delhi");
-            address2.setAddressLine("99 Karol Bagh");
-
-            List<Address> sellerAddress = new ArrayList<>();
-            sellerAddress.add(address2);
-            seller.setAddresses(sellerAddress);
-
-            UserRole roleOfSeller = new UserRole(seller,sellerRole);
-            seller.addRoles(roleOfSeller);
-
-            userRepository.save(seller);
-            userRepository.save(customer);
-            userRepository.save(admin);
-            System.out.println("Total users saved::"+userRepository.count());
-        }
-        roleRepository.save(adminRole);
-        roleRepository.save(sellerRole);
-        roleRepository.save(customerRole);
-    }
+//
+//        Role adminRole = new Role();
+//        adminRole.setAuthority("ROLE_ADMIN");
+//        Role sellerRole = new Role();
+//        sellerRole.setAuthority("ROLE_SELLER");
+//        Role customerRole = new Role();
+//        customerRole.setAuthority("ROLE_CUSTOMER");
+//
+//        if(userRepository.count()<1){
+//            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//
+//            Admin admin = new Admin();
+//            admin.setFirstName("admin");
+//            admin.setDeleted(false);
+//            admin.setEmail("admin");
+//            admin.setPassword(passwordEncoder.encode("admin"));
+//            admin.setActive(true);
+//            admin.setContact("4666762");
+//
+//            UserRole roleOfAdmin = new UserRole(admin,adminRole);
+//            admin.addRoles(roleOfAdmin);
+//
+//            Customer customer = new Customer();
+//            customer.setFirstName("Vardan");
+//            customer.setLastName("Balyan");
+//            customer.setContact("5735677");
+//            customer.setDeleted(false);
+//            customer.setEmail("vardan.balyan@tothenew.com");
+//            customer.setPassword(passwordEncoder.encode("pass"));
+//            customer.setActive(true);
+//
+//            Address address = new Address();
+//            address.setZipCode("110099");
+//            address.setLabel("home");
+//            address.setCountry("india");
+//            address.setState("delhi");
+//            address.setCity("new delhi");
+//            address.setAddressLine("212 Sadar bazar");
+//
+//            List<Address> addresses = new ArrayList<>();
+//            addresses.add(address);
+//            customer.setAddresses(addresses);
+//
+//            UserRole roleOfCustomer = new UserRole(customer, customerRole);
+//            customer.addRoles(roleOfCustomer);
+//
+//            Seller seller = new Seller();
+//            seller.setFirstName("Rohit");
+//            seller.setMiddleName("Kumar");
+//            seller.setLastName("Singh");
+//            seller.setDeleted(false);
+//            seller.setActive(true);
+//            seller.setEmail("rohit@gmail.com");
+//            seller.setPassword(passwordEncoder.encode("rohit"));
+//            seller.setGst("452452gg6327");
+//            seller.setCompanyContact("6746276223");
+//            seller.setCompanyName("Rohit Garments");
+//
+//            Address address2 = new Address();
+//            address2.setZipCode("110015");
+//            address2.setLabel("home");
+//            address2.setCountry("india");
+//            address2.setState("delhi");
+//            address2.setCity("new delhi");
+//            address2.setAddressLine("99 Karol Bagh");
+//
+//            List<Address> sellerAddress = new ArrayList<>();
+//            sellerAddress.add(address2);
+//            seller.setAddresses(sellerAddress);
+//
+//            UserRole roleOfSeller = new UserRole(seller,sellerRole);
+//            seller.addRoles(roleOfSeller);
+//
+//            userRepository.save(seller);
+//            userRepository.save(customer);
+//            userRepository.save(admin);
+//            System.out.println("Total users saved::"+userRepository.count());
+//        }
+//        roleRepository.save(adminRole);
+//        roleRepository.save(sellerRole);
+//        roleRepository.save(customerRole);
+   }
 }
