@@ -1,9 +1,6 @@
 package com.ttn.bootcampProject.controllers;
 
-import com.ttn.bootcampProject.dtos.CustomerProfileDto;
-import com.ttn.bootcampProject.dtos.DisplayProductForCustomerDto;
-import com.ttn.bootcampProject.dtos.UpdatePasswordDto;
-import com.ttn.bootcampProject.dtos.ViewAllCategoryForCustomerDto;
+import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.CustomerDaoService;
@@ -86,5 +83,11 @@ public class CustomerController {
     public List<DisplayProductForCustomerDto> viewAllProduct(@PathVariable long categoryId)
     {
         return productService.viewAllProductForCustomer(categoryId);
+    }
+
+    @GetMapping("/customer/similar-products/{productId}")
+    public List<ProductWithVariationImageDto> viewSimilarProducts(@PathVariable long productId)
+    {
+        return productService.viewSimilarProducts(productId);
     }
 }

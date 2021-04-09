@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.*;
 
@@ -508,7 +507,7 @@ public class ProductService {
 
     public ProductWithVariationImageDto viewAProductForAdmin(long id)
     {
-        Product product = productRepository.findById(id);
+        Product product = productRepository.findNonDeletedActiveProductById(id);
 
         if(product == null)
         {
@@ -550,7 +549,7 @@ public class ProductService {
     public List<ProductWithVariationImageDto> viewAllProductForAdmin()
     {
         List<ProductWithVariationImageDto> productWithVariationImageDtoList = new ArrayList<>();
-        List<Product> productList = productRepository.findAllNonDeletedProducts();
+        List<Product> productList = productRepository.findAllNonDeletedAndActiveProducts();
 
         for (Product product: productList) {
             Category productCategory = categoryRepository
@@ -583,7 +582,7 @@ public class ProductService {
 
     public DisplayProductForCustomerDto viewAProductForCustomer(long id)
     {
-        Product product = productRepository.findById(id);
+        Product product = productRepository.findNonDeletedActiveProductById(id);
 
         if(product == null)
         {
@@ -659,7 +658,7 @@ public class ProductService {
             throw new CategoryNotFoundException("Category id should be of leaf node Category.");
         }
 
-        List<Product> productList = productRepository.findAllProductWithVariationByCategoryId(productCategory.getId());
+        List<Product> productList = productRepository.findAllProductWithHasVariationByCategoryId(productCategory.getId());
 
         if(productList.isEmpty())
         {
@@ -703,5 +702,44 @@ public class ProductService {
         }
 
         return displayProductForCustomerDtoList;
+    }
+
+
+    public List<ProductWithVariationImageDto> viewSimilarProducts(long productId)
+    {
+        List<ProductWithVariationImageDto> productWithVariationImageDtoList = new ArrayList<>();
+        Product fetchedProduct = productRepository.findNonDeletedActiveProductById(productId);
+
+        List<Product> similarProducts = productRepository
+                .findAllSimilarProductWithHasVariationByCategoryId(productRepository
+                        .getCategoryIdForAProductId(fetchedProduct.getId()), fetchedProduct.getId());
+
+        for (Product product: similarProducts) {
+            Category productCategory = categoryRepository
+                    .findById(productRepository.getCategoryIdForAProductId(product.getId()));
+            List<ProductVariation> productVariations = productVariationRepository
+                    .getAllProductVariationForProductId(product.getId());
+
+            ProductWithVariationImageDto productWithVariationImageDto= new ProductWithVariationImageDto();
+            productWithVariationImageDto.setId(product.getId());
+            productWithVariationImageDto.setName(product.getName());
+            productWithVariationImageDto.setBrand(product.getBrand());
+            productWithVariationImageDto.setDescription(product.getDescription());
+            productWithVariationImageDto.setActive(product.isActive());
+            productWithVariationImageDto.setCancellable(product.isCancellable());
+            productWithVariationImageDto.setReturnable(product.isReturnable());
+            productWithVariationImageDto.setCategoryId(productCategory.getId());
+            productWithVariationImageDto.setCategoryName(productCategory.getName());
+
+            Map<Long,String> productVariationImages = new HashMap<>();
+
+            for (ProductVariation variation : productVariations) {
+                productVariationImages.put(variation.getId(), variation.getPrimaryImageName());
+            }
+            productWithVariationImageDto.setImageMap(productVariationImages);
+            productWithVariationImageDtoList.add(productWithVariationImageDto);
+        }
+
+        return productWithVariationImageDtoList;
     }
 }
