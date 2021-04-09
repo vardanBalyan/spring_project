@@ -710,6 +710,11 @@ public class ProductService {
         List<ProductWithVariationImageDto> productWithVariationImageDtoList = new ArrayList<>();
         Product fetchedProduct = productRepository.findNonDeletedActiveProductById(productId);
 
+        if(fetchedProduct == null)
+        {
+            throw new ProductNotFoundException("No product found for the provided product id.");
+        }
+
         List<Product> similarProducts = productRepository
                 .findAllSimilarProductWithHasVariationByCategoryId(productRepository
                         .getCategoryIdForAProductId(fetchedProduct.getId()), fetchedProduct.getId());
