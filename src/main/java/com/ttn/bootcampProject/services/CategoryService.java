@@ -1,14 +1,15 @@
 package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.dtos.*;
+import com.ttn.bootcampProject.entities.products.Product;
+import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.entities.products.categories.Category;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValues;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataFieldValuesId;
 import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
-import com.ttn.bootcampProject.repos.CategoryMetadataFieldRepository;
-import com.ttn.bootcampProject.repos.CategoryMetadataFieldValuesRepository;
-import com.ttn.bootcampProject.repos.CategoryRepository;
+import com.ttn.bootcampProject.exceptions.ProductNotFoundException;
+import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,10 @@ public class CategoryService {
     CategoryMetadataFieldRepository categoryMetadataFieldRepository;
     @Autowired
     CategoryMetadataFieldValuesRepository categoryMetadataFieldValuesRepository;
+    @Autowired
+    ProductRepository productRepository;
+    @Autowired
+    ProductVariationRepository productVariationRepository;
 
     public ResponseEntity<String> addCategory(AddCategoryDto categoryDto)
     {
@@ -330,6 +335,55 @@ public class CategoryService {
     }
 
 
+    public FilterCategoryDto filterCategory(long categoryId)
+    {
+        FilterCategoryDto filterCategoryDto = new FilterCategoryDto();
+
+        Category category = categoryRepository.findById(categoryId);
+
+        if(category == null)
+        {
+            throw new CategoryNotFoundException("Invalid category id.");
+        }
+
+        if(category.isHasChild())
+        {
+            throw new CategoryNotFoundException("Category passed is not a leaf category.");
+        }
+
+        List<Product> allProductsOfCategory = productRepository
+                .findAllNonDeletedProductWithHasVariationByCategoryId(category.getId());
+
+        if(allProductsOfCategory.isEmpty())
+        {
+            throw new ProductNotFoundException("No product exist for this category");
+        }
+
+        List<CategoryMetadataField> allCategoryMetadata = categoryMetadataFieldRepository.allMetadataFields();
+        List<String> brandNames = productRepository.getAllUniqueBrandNamesForCategoryId(category.getId());
+        List<Double> priceList = new ArrayList<>();
+
+        for (Product product: allProductsOfCategory) {
+            List<ProductVariation> variationList = productVariationRepository
+                    .getAllProductVariationForProductId(product.getId());
+
+            for (ProductVariation variation: variationList) {
+                priceList.add(variation.getPrice());
+            }
+        }
+
+        Collections.sort(priceList);
+
+        filterCategoryDto.setBrands(brandNames);
+        filterCategoryDto.setMinPrice(priceList.get(0));
+        filterCategoryDto.setMaxPrice(priceList.get(priceList.size()-1));
+        filterCategoryDto.setMetadata(getMapOfMetadataAndValues(category, allCategoryMetadata));
+
+        return filterCategoryDto;
+    }
+
+//--------------------------------------------------------------------------------------------------------//
+
     private String getParentChainInfo(Long parentId)
     {
         List<String> parentChainList = new ArrayList<>();
@@ -357,7 +411,6 @@ public class CategoryService {
 
         return parentChain.toString();
     }
-
 
     private Map<String,String> getMapOfMetadataAndValues(Category category, List<CategoryMetadataField> metadataFieldList)
     {

@@ -125,6 +125,12 @@ public class AdminController {
         return categoryService.updateCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
     }
 
+    @GetMapping("/filter-category/{id}")
+    public FilterCategoryDto filterCategory(@PathVariable long id)
+    {
+        return categoryService.filterCategory(id);
+    }
+
     @PatchMapping("/deactivate-product/{id}")
     public ResponseEntity<String> deactivateAProduct(@PathVariable long id)
     {

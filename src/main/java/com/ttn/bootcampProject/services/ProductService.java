@@ -658,7 +658,7 @@ public class ProductService {
             throw new CategoryNotFoundException("Category id should be of leaf node Category.");
         }
 
-        List<Product> productList = productRepository.findAllProductWithHasVariationByCategoryId(productCategory.getId());
+        List<Product> productList = productRepository.findAllNonDeletedActiveProductWithHasVariationByCategoryId(productCategory.getId());
 
         if(productList.isEmpty())
         {

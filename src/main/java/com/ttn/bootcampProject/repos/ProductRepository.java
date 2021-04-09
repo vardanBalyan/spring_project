@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface ProductRepository extends CrudRepository<Product, Long> {
 
-    @Query("select name from Product where brand=:brandName")
-    List<String> allProductNamesForABrandName(@Param("brandName") String brandName);
+    @Query(value = "select DISTINCT brand from product where category_id=:id",nativeQuery = true)
+    List<String> getAllUniqueBrandNamesForCategoryId(@Param("id") long id);
 
     @Query(value = "select * from product where seller_user_id=:sellerId AND category_id=:categoryId " +
             "AND brand=:brandName AND name=:productName", nativeQuery = true)
@@ -34,7 +34,7 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     @Query(value = "select * from product where category_id=:id AND is_deleted=false AND has_variation=true " +
             "AND is_active=true",nativeQuery = true)
-    List<Product> findAllProductWithHasVariationByCategoryId(@Param("id") long categoryId);
+    List<Product> findAllNonDeletedActiveProductWithHasVariationByCategoryId(@Param("id") long categoryId);
 
 
     @Query(value = "select * from product where id=:id AND is_deleted=false AND is_active=true", nativeQuery = true)
@@ -43,5 +43,11 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     @Query(value = "select * from product where category_id=:categoryId AND is_deleted=false AND has_variation=true " +
             "AND is_active=true AND id NOT IN (:productId)",nativeQuery = true)
-    List<Product> findAllSimilarProductWithHasVariationByCategoryId(@Param("categoryId") long categoryId, @Param("productId") long productId);
+    List<Product> findAllSimilarProductWithHasVariationByCategoryId(@Param("categoryId") long categoryId
+            , @Param("productId") long productId);
+
+
+    @Query(value = "select * from product where category_id=:id AND is_deleted=false AND has_variation=true"
+            ,nativeQuery = true)
+    List<Product> findAllNonDeletedProductWithHasVariationByCategoryId(@Param("id") long categoryId);
 }
