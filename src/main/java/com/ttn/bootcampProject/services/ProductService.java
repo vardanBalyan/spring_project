@@ -6,6 +6,7 @@ import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.products.Product;
 import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.entities.products.categories.Category;
+import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
 import com.ttn.bootcampProject.exceptions.ProductNotFoundException;
 import com.ttn.bootcampProject.exceptions.ProductVariationNotFoundException;
 import com.ttn.bootcampProject.repos.*;
@@ -130,7 +131,8 @@ public class ProductService {
         for (Product product: allProductOfSeller) {
 
             DisplayProductDto displayProductDto = new DisplayProductDto();
-            Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+            Category productCategory = categoryRepository
+                    .findById(productRepository.getCategoryIdForAProductId(product.getId()));
 
             displayProductDto.setId(product.getId());
             displayProductDto.setName(product.getName());
@@ -188,7 +190,8 @@ public class ProductService {
 
         if(updateProduct.getName().equals(product.getName()))
         {
-            return new ResponseEntity("Current name and new name of product should not be same.",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Current name and new name of product should not be same."
+                    ,HttpStatus.BAD_REQUEST);
         }
 
         Product nameCheck = productRepository.getProductByCombination(seller.getId()
@@ -276,6 +279,8 @@ public class ProductService {
         productVariation.setMetadata(addProductVariationDto.getMetadata());
 
         productVariations.add(productVariation);
+
+        product.setHasVariation(true);
         product.setProductVariationList(productVariations);
         productRepository.save(product);
 
@@ -305,7 +310,8 @@ public class ProductService {
             throw new ProductNotFoundException("Particular product variation not found for your products.");
         }
 
-        Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+        Category productCategory = categoryRepository
+                .findById(productRepository.getCategoryIdForAProductId(product.getId()));
 
         DisplayProductVariationDto displayProductVariationDto = new DisplayProductVariationDto();
         DisplayProductDto displayProductDto = new DisplayProductDto();
@@ -344,11 +350,13 @@ public class ProductService {
 
         for (Product product: allProductOfSeller) {
 
-            List<ProductVariation> productVariations = productVariationRepository.getAllProductVariationForProductId(product.getId());
+            List<ProductVariation> productVariations = productVariationRepository
+                    .getAllProductVariationForProductId(product.getId());
 
             for (ProductVariation productVariation: productVariations) {
 
-                Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
+                Category productCategory = categoryRepository
+                        .findById(productRepository.getCategoryIdForAProductId(product.getId()));
 
                 DisplayProductVariationDto displayProductVariationDto = new DisplayProductVariationDto();
                 DisplayProductDto displayProductDto = new DisplayProductDto();
@@ -380,7 +388,8 @@ public class ProductService {
     }
 
 
-    public ResponseEntity<String> updateProductVariation(AddProductVariationDto addProductVariationDto, String email, long id)
+    public ResponseEntity<String> updateProductVariation(AddProductVariationDto addProductVariationDto
+            , String email, long id)
     {
 
         ProductVariation productVariation = productVariationRepository.findById(id);
@@ -511,8 +520,10 @@ public class ProductService {
             throw new ProductNotFoundException("No product found for the provided product id.");
         }
 
-        Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
-        List<ProductVariation> productVariations = productVariationRepository.getAllProductVariationForProductId(product.getId());
+        Category productCategory = categoryRepository
+                .findById(productRepository.getCategoryIdForAProductId(product.getId()));
+        List<ProductVariation> productVariations = productVariationRepository
+                .getAllProductVariationForProductId(product.getId());
 
         ProductWithVariationImageDto productWithVariationImageDto= new ProductWithVariationImageDto();
         productWithVariationImageDto.setId(product.getId());
@@ -542,8 +553,10 @@ public class ProductService {
         List<Product> productList = productRepository.findAllNonDeletedProducts();
 
         for (Product product: productList) {
-            Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(product.getId()));
-            List<ProductVariation> productVariations = productVariationRepository.getAllProductVariationForProductId(product.getId());
+            Category productCategory = categoryRepository
+                    .findById(productRepository.getCategoryIdForAProductId(product.getId()));
+            List<ProductVariation> productVariations = productVariationRepository
+                    .getAllProductVariationForProductId(product.getId());
 
             ProductWithVariationImageDto productWithVariationImageDto= new ProductWithVariationImageDto();
             productWithVariationImageDto.setId(product.getId());
@@ -566,5 +579,129 @@ public class ProductService {
         }
 
         return productWithVariationImageDtoList;
+    }
+
+    public DisplayProductForCustomerDto viewAProductForCustomer(long id)
+    {
+        Product product = productRepository.findById(id);
+
+        if(product == null)
+        {
+            throw new ProductNotFoundException("No product found for the provided product id.");
+        }
+
+        if(product.isDeleted())
+        {
+            throw new ProductNotFoundException("No product found for the provided product id.");
+        }
+
+
+        Category productCategory = categoryRepository
+                .findById(productRepository.getCategoryIdForAProductId(product.getId()));
+        List<ProductVariation> productVariations = productVariationRepository
+                .getAllProductVariationForProductId(product.getId());
+
+        if(productVariations.isEmpty())
+        {
+            throw new ProductVariationNotFoundException("No product variation found.");
+        }
+
+        DisplayProductForCustomerDto displayProductForCustomerDto = new DisplayProductForCustomerDto();
+
+        List<DisplayProductVariationForCustomerDto> variationListForProduct = new ArrayList<>();
+
+        for (ProductVariation variation:productVariations) {
+            DisplayProductVariationForCustomerDto productVariationForCustomerDto =
+                    new DisplayProductVariationForCustomerDto();
+
+            productVariationForCustomerDto.setId(variation.getId());
+            productVariationForCustomerDto.setPrice(variation.getPrice());
+            productVariationForCustomerDto.setActive(variation.isActive());
+            productVariationForCustomerDto.setQuantityAvailable(variation.getQuantityAvailable());
+            productVariationForCustomerDto.setPrimaryImageName(variation.getPrimaryImageName());
+            productVariationForCustomerDto.setMetadata(variation.getMetadata());
+
+            variationListForProduct.add(productVariationForCustomerDto);
+        }
+
+        displayProductForCustomerDto.setBrand(product.getBrand());
+        displayProductForCustomerDto.setCancellable(product.isCancellable());
+        displayProductForCustomerDto.setDescription(product.getDescription());
+        displayProductForCustomerDto.setActive(product.isActive());
+        displayProductForCustomerDto.setCategoryName(productCategory.getName());
+        displayProductForCustomerDto.setId(product.getId());
+        displayProductForCustomerDto.setName(product.getName());
+        displayProductForCustomerDto.setCategoryId(productCategory.getId());
+        displayProductForCustomerDto.setReturnable(product.isReturnable());
+        displayProductForCustomerDto.setVariations(variationListForProduct);
+
+        return displayProductForCustomerDto;
+    }
+
+
+
+    public List<DisplayProductForCustomerDto> viewAllProductForCustomer(long id)
+    {
+
+        List<DisplayProductForCustomerDto> displayProductForCustomerDtoList = new ArrayList<>();
+
+        // getting productCategory for the provided id
+        Category productCategory = categoryRepository.findById(id);
+
+        if(productCategory == null)
+        {
+            throw new CategoryNotFoundException("No productCategory found for the provided Category id.");
+        }
+
+        // checking if the productCategory is leaf node or not
+        if(productCategory.isHasChild())
+        {
+            throw new CategoryNotFoundException("Category id should be of leaf node Category.");
+        }
+
+        List<Product> productList = productRepository.findAllProductWithVariationByCategoryId(productCategory.getId());
+
+        if(productList.isEmpty())
+        {
+            throw new ProductNotFoundException("No products found.");
+        }
+
+        for (Product product: productList) {
+            List<ProductVariation> productVariations = productVariationRepository
+                    .getAllProductVariationForProductId(product.getId());
+
+            DisplayProductForCustomerDto displayProductForCustomerDto = new DisplayProductForCustomerDto();
+
+            List<DisplayProductVariationForCustomerDto> variationListForProduct = new ArrayList<>();
+
+            for (ProductVariation variation:productVariations) {
+                DisplayProductVariationForCustomerDto productVariationForCustomerDto =
+                        new DisplayProductVariationForCustomerDto();
+
+                productVariationForCustomerDto.setId(variation.getId());
+                productVariationForCustomerDto.setPrice(variation.getPrice());
+                productVariationForCustomerDto.setActive(variation.isActive());
+                productVariationForCustomerDto.setQuantityAvailable(variation.getQuantityAvailable());
+                productVariationForCustomerDto.setPrimaryImageName(variation.getPrimaryImageName());
+                productVariationForCustomerDto.setMetadata(variation.getMetadata());
+
+                variationListForProduct.add(productVariationForCustomerDto);
+            }
+
+            displayProductForCustomerDto.setBrand(product.getBrand());
+            displayProductForCustomerDto.setCancellable(product.isCancellable());
+            displayProductForCustomerDto.setDescription(product.getDescription());
+            displayProductForCustomerDto.setActive(product.isActive());
+            displayProductForCustomerDto.setCategoryName(productCategory.getName());
+            displayProductForCustomerDto.setId(product.getId());
+            displayProductForCustomerDto.setName(product.getName());
+            displayProductForCustomerDto.setCategoryId(productCategory.getId());
+            displayProductForCustomerDto.setReturnable(product.isReturnable());
+            displayProductForCustomerDto.setVariations(variationListForProduct);
+
+            displayProductForCustomerDtoList.add(displayProductForCustomerDto);
+        }
+
+        return displayProductForCustomerDtoList;
     }
 }

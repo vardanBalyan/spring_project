@@ -82,7 +82,7 @@ public class ForgotPasswordService {
             // checking if new password and confirm password is same or not
             if(updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword()))
             {
-                registeredUser.setPassword(updatePasswordDto.getNewPassword());
+                registeredUser.setPassword(encoder.encode(updatePasswordDto.getNewPassword()));
                 userRepository.save(registeredUser);
                 // deleting the token from the database
                 confirmationTokenRepository.deleteById(token.getTokenId());

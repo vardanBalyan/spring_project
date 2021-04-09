@@ -31,4 +31,7 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     @Query("from Product where isDeleted=false")
     List<Product> findAllNonDeletedProducts();
+
+    @Query(value = "select * from product where category_id=:id AND is_deleted=false AND has_variation=true",nativeQuery = true)
+    List<Product> findAllProductWithVariationByCategoryId(@Param("id") long categoryId);
 }

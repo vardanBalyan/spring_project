@@ -21,6 +21,7 @@ public class Product {
     private boolean isReturnable;
     private boolean isActive;
     private boolean isDeleted;
+    private boolean hasVariation;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
     private List<ProductReview> productReviews;
 
