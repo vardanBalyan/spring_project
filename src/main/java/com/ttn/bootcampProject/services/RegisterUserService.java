@@ -73,8 +73,16 @@ public class RegisterUserService {
         ConfirmationToken token = confirmationTokenRepository
                 .findByConfirmationToken(confirmationToken);
 
-        // checking if token exist
-        if (token != null) {
+        long expirationTime = 5*60000;
+
+        // checking if token exists
+        if(token == null)
+        {
+            return new ResponseEntity("Invalid token",HttpStatus.NOT_FOUND);
+        }
+
+        if((token.getCreatedDate().getTime() + expirationTime) > System.currentTimeMillis())
+        {
             //  getting user from the userid associated with the confirmation token
             User user = userRepository.findByEmail(token.getUser().getEmail());
             // activating user account
@@ -83,7 +91,10 @@ public class RegisterUserService {
             userRepository.save(user);
             return new ResponseEntity("Customer activated successfully!!", HttpStatus.CREATED);
         }
-        return new ResponseEntity("Incorrect confirmation token.!",HttpStatus.BAD_REQUEST);
+
+        // deleting the token if token got expired
+        confirmationTokenRepository.deleteById(token.getTokenId());
+        return new ResponseEntity("Token expired!!",HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<String> resendActivationLink(String email)
