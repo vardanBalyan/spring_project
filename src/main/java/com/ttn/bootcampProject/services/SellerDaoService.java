@@ -93,10 +93,12 @@ public class SellerDaoService {
     public ResponseEntity<String> updateAnAddress(Address address, long id, String email)
     {
         User user = userRepository.findByEmail(email);
+        // getting address id for seller
         List<Long> addressIds = addressRepository.findAddressIdsForUserId(user.getId());
 
         if(addressIds.contains(id))
         {
+            // updating address
             Address updatedAddress = addressRepository.findById(id);
             updatedAddress.setAddressLine(address.getAddressLine());
             updatedAddress.setLabel(address.getLabel());

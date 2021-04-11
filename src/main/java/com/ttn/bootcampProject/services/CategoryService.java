@@ -35,7 +35,7 @@ public class CategoryService {
     {
 
         Category category = new Category();
-        category.setName(categoryDto.getName());
+        category.setName(categoryDto.getName().toLowerCase());
 
         if(categoryDto.getParentId() != null)
         {
@@ -189,67 +189,77 @@ public class CategoryService {
         return categoryMetadataFieldRepository.allMetadataFields();
     }
 
-    public ResponseEntity<String> addCategoryMetadataFieldValues(CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    public ResponseEntity<String> addCategoryMetadataFieldValues(AddCategoryMetadataFieldValuesDto addCategoryMetadataFieldValuesDto)
     {
-        // getting metadata for the provided id
-        CategoryMetadataField categoryMetadata = categoryMetadataFieldRepository
-                .findById(categoryMetadataFieldValuesDto.getMetadataId());
-        // getting category for the provided id
-        Category category = categoryRepository
-                .findById(categoryMetadataFieldValuesDto.getCategoryId());
+        for (CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto
+                : addCategoryMetadataFieldValuesDto.getCategoryMetadataFieldValuesDtoList()) {
 
-        if(categoryMetadata == null)
-        {
-            return new ResponseEntity("No metadata found for the provided metadata id."
-                    ,HttpStatus.NOT_FOUND);
+            // getting metadata for the provided id
+            CategoryMetadataField categoryMetadata = categoryMetadataFieldRepository
+                    .findById(categoryMetadataFieldValuesDto.getMetadataId());
+            // getting category for the provided id
+            Category category = categoryRepository
+                    .findById(categoryMetadataFieldValuesDto.getCategoryId());
+
+            if(categoryMetadata == null)
+            {
+                return new ResponseEntity("No metadata found for the provided metadata id."
+                        ,HttpStatus.NOT_FOUND);
+            }
+
+            if(category == null)
+            {
+                return new ResponseEntity("No category found for the provided category id."
+                        ,HttpStatus.NOT_FOUND);
+            }
+
+            // checking if the category is leaf node or not
+            if(category.isHasChild())
+            {
+                return new ResponseEntity("Category id should be of leaf node category."
+                        ,HttpStatus.BAD_REQUEST);
+            }
+
+            CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
+
+            // creating the composite key id for the CategoryMetadataFieldValues table
+            CategoryMetadataFieldValuesId metadataFieldValuesId = new CategoryMetadataFieldValuesId();
+            metadataFieldValuesId.setCategoryId(category.getId());
+            metadataFieldValuesId.setCategoryMetadataFieldId(categoryMetadata.getId());
+
+            // assigning parameters and saving
+            metadataFieldValues.setId(metadataFieldValuesId);
+            metadataFieldValues.setCategory(category);
+            metadataFieldValues.setCategoryMetadataField(categoryMetadata);
+            metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
+            categoryMetadataFieldValuesRepository.save(metadataFieldValues);
         }
 
-        if(category == null)
-        {
-            return new ResponseEntity("No category found for the provided category id."
-                    ,HttpStatus.NOT_FOUND);
-        }
-
-        // checking if the category is leaf node or not
-        if(category.isHasChild())
-        {
-            return new ResponseEntity("Category id should be of leaf node category."
-                    ,HttpStatus.BAD_REQUEST);
-        }
-
-        CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
-
-        // creating the composite key id for the CategoryMetadataFieldValues table
-        CategoryMetadataFieldValuesId metadataFieldValuesId = new CategoryMetadataFieldValuesId();
-        metadataFieldValuesId.setCategoryId(category.getId());
-        metadataFieldValuesId.setCategoryMetadataFieldId(categoryMetadata.getId());
-
-        // assigning parameters and saving
-        metadataFieldValues.setId(metadataFieldValuesId);
-        metadataFieldValues.setCategory(category);
-        metadataFieldValues.setCategoryMetadataField(categoryMetadata);
-        metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
-        categoryMetadataFieldValuesRepository.save(metadataFieldValues);
         return new ResponseEntity("New metadata field values created successfully."
                 ,HttpStatus.CREATED);
     }
 
-    public ResponseEntity<String> updateCategoryMetadataFieldValues(CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    public ResponseEntity<String> updateCategoryMetadataFieldValues(AddCategoryMetadataFieldValuesDto addCategoryMetadataFieldValuesDto)
     {
-        // getting the metadata filed value for the provided category id and metadata id to check if exist or not
-        CategoryMetadataFieldValues metadataFieldValues = categoryMetadataFieldValuesRepository
-                .findByMetadataCompositeId(categoryMetadataFieldValuesDto.getCategoryId()
-                        ,categoryMetadataFieldValuesDto.getMetadataId());
 
-        if(metadataFieldValues == null)
-        {
-            return new ResponseEntity("No metadata field values found for the provided category and metadata id."
-                    ,HttpStatus.NOT_FOUND);
+        for (CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto
+                : addCategoryMetadataFieldValuesDto.getCategoryMetadataFieldValuesDtoList()) {
+            // getting the metadata filed value for the provided category id and metadata id to check if exist or not
+            CategoryMetadataFieldValues metadataFieldValues = categoryMetadataFieldValuesRepository
+                    .findByMetadataCompositeId(categoryMetadataFieldValuesDto.getCategoryId()
+                            ,categoryMetadataFieldValuesDto.getMetadataId());
+
+            if(metadataFieldValues == null)
+            {
+                return new ResponseEntity("No metadata field values found for the provided category and metadata id."
+                        ,HttpStatus.NOT_FOUND);
+            }
+
+            // updating values
+            metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
+            categoryMetadataFieldValuesRepository.save(metadataFieldValues);
         }
 
-        // updating values
-        metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
-        categoryMetadataFieldValuesRepository.save(metadataFieldValues);
         return new ResponseEntity("Values updated successfully.",HttpStatus.ACCEPTED);
     }
 

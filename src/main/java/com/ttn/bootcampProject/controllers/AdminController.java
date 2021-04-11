@@ -114,22 +114,20 @@ public class AdminController {
     }
 
     @PostMapping("/add-metadata-field-values")
-    public ResponseEntity<String> addMetadataFieldValues(@RequestBody CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    public ResponseEntity<String> addMetadataFieldValues(
+            @Valid @RequestBody AddCategoryMetadataFieldValuesDto addCategoryMetadataFieldValuesDto)
     {
-        return categoryService.addCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
+        return categoryService.addCategoryMetadataFieldValues(addCategoryMetadataFieldValuesDto);
     }
 
     @PatchMapping("/update-metadata-field-values")
-    public ResponseEntity<String> updateMetadataFieldValues(@RequestBody CategoryMetadataFieldValuesDto categoryMetadataFieldValuesDto)
+    public ResponseEntity<String> updateMetadataFieldValues(
+            @Valid @RequestBody AddCategoryMetadataFieldValuesDto addCategoryMetadataFieldValuesDto)
     {
-        return categoryService.updateCategoryMetadataFieldValues(categoryMetadataFieldValuesDto);
+        return categoryService.updateCategoryMetadataFieldValues(addCategoryMetadataFieldValuesDto);
     }
 
-    @GetMapping("/filter-category/{id}")
-    public FilterCategoryDto filterCategory(@PathVariable long id)
-    {
-        return categoryService.filterCategory(id);
-    }
+
 
     @PatchMapping("/deactivate-product/{id}")
     public ResponseEntity<String> deactivateAProduct(@PathVariable long id)

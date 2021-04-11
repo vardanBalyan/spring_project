@@ -9,7 +9,9 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class CategoryMetadataFieldValuesDto {
 
+    @NotNull
     private long categoryId;
+    @NotNull
     private long metadataId;
     @NotNull
     private String values;
