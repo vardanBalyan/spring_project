@@ -184,6 +184,8 @@ public class CategoryService {
         return new ResponseEntity("Added new category metadata field.",HttpStatus.ACCEPTED);
     }
 
+    int iterationCounter = 0;
+
     public List<CategoryMetadataField> viewAllMetadataFields()
     {
         return categoryMetadataFieldRepository.allMetadataFields();
@@ -203,20 +205,22 @@ public class CategoryService {
 
             if(categoryMetadata == null)
             {
-                return new ResponseEntity("No metadata found for the provided metadata id."
-                        ,HttpStatus.NOT_FOUND);
+                return new ResponseEntity("No metadata found for the provided metadata id in "+iterationCounter
+                        +" element of list.",HttpStatus.NOT_FOUND);
             }
 
             if(category == null)
             {
-                return new ResponseEntity("No category found for the provided category id."
+                return new ResponseEntity("No category found for the provided category id in "+iterationCounter
+                        +" element of list."
                         ,HttpStatus.NOT_FOUND);
             }
 
             // checking if the category is leaf node or not
             if(category.isHasChild())
             {
-                return new ResponseEntity("Category id should be of leaf node category."
+                return new ResponseEntity("Category id should be of leaf node category in "+iterationCounter
+                        +" element of list."
                         ,HttpStatus.BAD_REQUEST);
             }
 
@@ -233,6 +237,8 @@ public class CategoryService {
             metadataFieldValues.setCategoryMetadataField(categoryMetadata);
             metadataFieldValues.setValue(categoryMetadataFieldValuesDto.getValues());
             categoryMetadataFieldValuesRepository.save(metadataFieldValues);
+
+            iterationCounter++;
         }
 
         return new ResponseEntity("New metadata field values created successfully."
