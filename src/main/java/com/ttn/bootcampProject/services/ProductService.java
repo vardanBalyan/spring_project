@@ -43,9 +43,8 @@ public class ProductService {
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
         List<Product> sellerProductList = seller.getProductList();
 
+        // getting category
         Category category = categoryRepository.findById(addProductDto.getCategoryId());
-        System.out.println(">>>>>>>>"+addProductDto.isReturnable());
-        System.out.println(">>>>>>>"+addProductDto.isCancellable());
 
         if(category == null)
         {
@@ -53,6 +52,7 @@ public class ProductService {
                     ,HttpStatus.NOT_FOUND);
         }
 
+        // checking for leaf category
         if(category.isHasChild())
         {
             return new ResponseEntity("Category provided is not a leaf category.",HttpStatus.BAD_REQUEST);
@@ -61,6 +61,7 @@ public class ProductService {
         Product productCheck = productRepository.getProductByCombination(seller.getId(), category.getId()
                 , addProductDto.getBrand().toLowerCase(), addProductDto.getName().toLowerCase());
 
+        // checking for the unique product name
         if(productCheck != null)
         {
             return new ResponseEntity("A product already exist with same name.",HttpStatus.BAD_REQUEST);
@@ -86,22 +87,23 @@ public class ProductService {
         return new ResponseEntity("Product saves successfully.",HttpStatus.CREATED);
     }
 
-    public DisplayProductDto viewAProduct(long id, String email)
+    public DisplayProductDto viewAProduct(long productId, String email)
     {
         // finding user by email getting from principal
         User user = userRepository.findByEmail(email);
         // finding the seller from user id we got from email
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
+        // getting all ids of seller's product
         List<Long> allProductIdsOfLoggedInSeller = productRepository.getAllProductIdsForSellerId(seller.getId());
 
-        if(!allProductIdsOfLoggedInSeller.contains(id))
+        if(!allProductIdsOfLoggedInSeller.contains(productId))
         {
             return null;
         }
 
-        Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(id));
-        Product product = productRepository.findById(id);
+        Category productCategory = categoryRepository.findById(productRepository.getCategoryIdForAProductId(productId));
+        Product product = productRepository.findById(productId);
 
         DisplayProductDto displayProductDto = new DisplayProductDto();
         displayProductDto.setId(product.getId());
@@ -123,6 +125,7 @@ public class ProductService {
         // finding the seller from user id we got from email
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
+        // getting all products of seller
         List<Product> allProductOfSeller = productRepository.getAllProductsOfSeller(seller.getId());
 
         List<DisplayProductDto> displayProductDtoList = new ArrayList<>();
@@ -178,6 +181,7 @@ public class ProductService {
         // finding the seller from user id we got from email
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
+        // getting all ids of seller's product
         List<Long> allProductIdsOfLoggedInSeller = productRepository.getAllProductIdsForSellerId(seller.getId());
 
         if(!allProductIdsOfLoggedInSeller.contains(id))
@@ -197,6 +201,7 @@ public class ProductService {
                 , productRepository.getCategoryIdForAProductId(product.getId())
         , product.getBrand(), updateProduct.getName());
 
+        // checking for unique name
         if(nameCheck != null)
         {
             return new ResponseEntity("A product already exist with same name.",HttpStatus.BAD_REQUEST);
@@ -219,6 +224,7 @@ public class ProductService {
         // finding the seller from user id we got from email
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
+        // getting all ids of seller's product
         List<Long> allProductIdsOfLoggedInSeller = productRepository.getAllProductIdsForSellerId(seller.getId());
 
         Product product = productRepository.findById(addProductVariationDto.getProductId());
@@ -287,9 +293,9 @@ public class ProductService {
     }
 
 
-    public DisplayProductVariationDto viewAProductVariation(long id, String email)
+    public DisplayProductVariationDto viewAProductVariation(long productVariationId, String email)
     {
-        ProductVariation productVariation = productVariationRepository.findById(id);
+        ProductVariation productVariation = productVariationRepository.findById(productVariationId);
 
         if(productVariation == null)
         {
@@ -302,8 +308,9 @@ public class ProductService {
 
         List<Long> allProductIdsOfLoggedInSeller = productRepository.getAllProductIdsForSellerId(seller.getId());
 
-        Product product = productRepository.findById(productVariationRepository.getProductIdForVariationId(id));
+        Product product = productRepository.findById(productVariationRepository.getProductIdForVariationId(productVariationId));
 
+        // checking if logged in seller is the creator of product variation
         if(!allProductIdsOfLoggedInSeller.contains(product.getId()) || product.isDeleted())
         {
             throw new ProductNotFoundException("Particular product variation not found for your products.");
@@ -345,10 +352,12 @@ public class ProductService {
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
         List<DisplayProductVariationDto> displayProductVariationDtoList = new ArrayList<>();
+        // getting all products of seller
         List<Product> allProductOfSeller = productRepository.getAllProductsOfSeller(seller.getId());
 
         for (Product product: allProductOfSeller) {
 
+            // getting all variations of product using product id
             List<ProductVariation> productVariations = productVariationRepository
                     .getAllProductVariationForProductId(product.getId());
 
@@ -406,18 +415,16 @@ public class ProductService {
 
         Product product = productRepository.findById(addProductVariationDto.getProductId());
 
-        System.out.println(">>>>>>"+addProductVariationDto.getProductId());
-        System.out.println(">>>>>>>>>"+allProductIdsOfLoggedInSeller);
         if(!allProductIdsOfLoggedInSeller.contains(addProductVariationDto.getProductId()) || product.isDeleted())
         {
             return new ResponseEntity("No product found with particular product id.",HttpStatus.NOT_FOUND);
         }
 
 
-//        if(!product.isActive())
-//        {
-//            return new ResponseEntity("Product is not active.",HttpStatus.BAD_REQUEST);
-//        }
+        if(!product.isActive())
+        {
+            return new ResponseEntity("Product is not active.",HttpStatus.BAD_REQUEST);
+        }
 
         // getting the category id to use in metadata validation
         long categoryId = productRepository.getCategoryIdForAProductId(product.getId());
@@ -468,16 +475,19 @@ public class ProductService {
     {
         Product product = productRepository.findById(id);
 
+        // checking if product exist
         if(product == null)
         {
             return new ResponseEntity("No product found for the provided product id.",HttpStatus.BAD_REQUEST);
         }
 
+        // checking if already active
         if(product.isActive())
         {
             return new ResponseEntity("Product is already active.",HttpStatus.BAD_REQUEST);
         }
 
+        // activating
         product.setActive(true);
         productRepository.save(product);
 
@@ -488,16 +498,19 @@ public class ProductService {
     {
         Product product = productRepository.findById(id);
 
+        // checking if product exist
         if(product == null)
         {
             return new ResponseEntity("No product found for the provided product id.",HttpStatus.BAD_REQUEST);
         }
 
+        // checking if already de-active
         if(!product.isActive())
         {
             return new ResponseEntity("Product is already de-active.",HttpStatus.BAD_REQUEST);
         }
 
+        // deactivating
         product.setActive(false);
         productRepository.save(product);
 

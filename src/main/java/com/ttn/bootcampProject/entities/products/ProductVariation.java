@@ -17,6 +17,7 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
+@Table(name = "product_variation")
 @TypeDef(name = "jsonb", typeClass = JsonStringType.class)
 public class ProductVariation {
 

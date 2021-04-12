@@ -26,7 +26,7 @@ public class Bootstrap implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
+//
 //        Role adminRole = new Role();
 //        adminRole.setAuthority("ROLE_ADMIN");
 //        Role sellerRole = new Role();
