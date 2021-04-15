@@ -40,6 +40,17 @@ public class UserDaoService {
 
         // getting user details
         User user = userRepository.findByEmail(email);
+
+        if(user.isDeleted())
+        {
+            throw new UserNotFoundException("No user exist with these credentials.");
+        }
+
+        if(!user.isActive())
+        {
+            throw new UserNotFoundException("Cannot login, user is inactive.");
+        }
+
         // getting list of user roles for the user id from user_role table
         List<UserRole> roles = userRoleRepository.findRecordForUserId(user.getId());
         List<Long> roleIds = new ArrayList<>();

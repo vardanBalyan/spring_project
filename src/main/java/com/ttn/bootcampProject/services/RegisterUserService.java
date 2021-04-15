@@ -12,6 +12,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Repository
 public class RegisterUserService {
 
@@ -48,7 +51,6 @@ public class RegisterUserService {
         customer.addRoles(roleOfCustomer);
 
         customerRepository.save(customer);
-
         // creating new confirmation token
         ConfirmationToken confirmationToken = new ConfirmationToken(customer);
         confirmationTokenRepository.save(confirmationToken);
@@ -73,7 +75,7 @@ public class RegisterUserService {
         ConfirmationToken token = confirmationTokenRepository
                 .findByConfirmationToken(confirmationToken);
 
-        long expirationTime = 5*60000;
+        long expirationTime = 2*60000;
 
         // checking if token exists
         if(token == null)
@@ -81,8 +83,8 @@ public class RegisterUserService {
             return new ResponseEntity("Invalid token",HttpStatus.NOT_FOUND);
         }
 
-        if((token.getCreatedDate().getTime() + expirationTime) > System.currentTimeMillis())
-        {
+        // checking if token expired or not
+        if((token.getCreatedDate().getTime() + expirationTime) > System.currentTimeMillis()) {
             //  getting user from the userid associated with the confirmation token
             User user = userRepository.findByEmail(token.getUser().getEmail());
             // activating user account
@@ -100,8 +102,9 @@ public class RegisterUserService {
     public ResponseEntity<String> resendActivationLink(String email)
     {
         User user = userRepository.findByEmail(email);
-        //
-        ConfirmationToken token = confirmationTokenRepository.findByUserId(user.getId());
+        // creating new confirmation token
+        ConfirmationToken confirmationToken = new ConfirmationToken(user);
+        confirmationTokenRepository.save(confirmationToken);
 
         // sending mail
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -110,7 +113,7 @@ public class RegisterUserService {
         mailMessage.setFrom("vardanbalyan97@gmail.com");
         mailMessage.setText("To confirm your account, please click here : "
                 +"http://localhost:8080/confirm-account?token="
-                +token.getConfirmationToken());
+                +confirmationToken.getConfirmationToken());
 
         mailService.sendRegisterMail(mailMessage);
         return new ResponseEntity("Please check your mail to activate your account."
