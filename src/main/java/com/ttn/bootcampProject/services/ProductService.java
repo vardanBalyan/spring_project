@@ -295,7 +295,7 @@ public class ProductService {
 
     public DisplayProductVariationDto viewAProductVariation(long productVariationId, String email)
     {
-        ProductVariation productVariation = productVariationRepository.findById(productVariationId);
+        ProductVariation productVariation = productVariationRepository.findProductVariationById(productVariationId);
 
         if(productVariation == null)
         {
@@ -400,7 +400,7 @@ public class ProductService {
             , String email, long id)
     {
 
-        ProductVariation productVariation = productVariationRepository.findById(id);
+        ProductVariation productVariation = productVariationRepository.findProductVariationById(id);
 
         if(productVariation == null)
         {

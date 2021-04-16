@@ -102,8 +102,32 @@ public class CustomerController {
     }
 
     @PostMapping("/add-product-to-cart")
-    public ResponseEntity<String> addProductToCart(@RequestBody CartDto cartDto, Principal principal)
+    public ResponseEntity<String> addProductToCart(@Valid @RequestBody CartDto cartDto, Principal principal)
     {
         return cartService.addProductToCart(cartDto, principal.getName());
+    }
+
+    @GetMapping("/view-cart")
+    public List<DisplayCartDto> viewCart(Principal principal)
+    {
+        return cartService.viewCart(principal.getName());
+    }
+
+    @DeleteMapping("/delete-from-cart/{variationId}")
+    public ResponseEntity<String> deleteProductFromCart(@PathVariable long variationId, Principal principal)
+    {
+        return cartService.deleteProductFromCart(variationId, principal.getName());
+    }
+
+    @PutMapping("/update-product-in-cart")
+    public ResponseEntity<String> updateProductIncCart(@Valid @RequestBody CartDto cartDto, Principal principal)
+    {
+        return cartService.updateProductInCart(cartDto, principal.getName());
+    }
+
+    @DeleteMapping("/empty-cart")
+    public ResponseEntity<String> emptyCart(Principal principal)
+    {
+        return cartService.emptyCart(principal.getName());
     }
 }

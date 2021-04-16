@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface ProductVariationRepository extends CrudRepository<ProductVariation, Long> {
 
+    @Query("from ProductVariation where id=:id")
+    ProductVariation findProductVariationById(@Param("id") long id);
+
     ProductVariation findById(long id);
 
     @Query(value = "select product_id from product_variation where id=:id",nativeQuery = true)
