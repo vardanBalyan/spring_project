@@ -2,6 +2,7 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Address;
+import com.ttn.bootcampProject.services.CartService;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.CustomerDaoService;
 import com.ttn.bootcampProject.services.ProductService;
@@ -23,6 +24,8 @@ public class CustomerController {
     CategoryService categoryService;
     @Autowired
     ProductService productService;
+    @Autowired
+    CartService cartService;
 
     @GetMapping("/profile")
     public CustomerProfileDto customerProfile(Principal principal) {
@@ -96,5 +99,11 @@ public class CustomerController {
     public List<ProductWithVariationImageDto> viewSimilarProducts(@PathVariable long productId)
     {
         return productService.viewSimilarProducts(productId);
+    }
+
+    @PostMapping("/add-product-to-cart")
+    public ResponseEntity<String> addProductToCart(@RequestBody CartDto cartDto, Principal principal)
+    {
+        return cartService.addProductToCart(cartDto, principal.getName());
     }
 }
