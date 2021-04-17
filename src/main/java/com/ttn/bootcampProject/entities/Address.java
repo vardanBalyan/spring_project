@@ -3,10 +3,7 @@ package com.ttn.bootcampProject.entities;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -22,5 +19,8 @@ public class Address {
     private String addressLine;
     private String zipCode;
     private String label;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

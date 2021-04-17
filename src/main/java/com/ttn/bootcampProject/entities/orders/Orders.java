@@ -27,9 +27,10 @@ public class Orders {
     private String customerAddressAddressLine;
     private String customerAddressZipCode;
     private String customerAddressLabel;
-
-    @OneToMany
-    @JoinColumn(name = "order_id")
+    @ManyToOne
+    @JoinColumn(name = "customer_user_id")
+    private Customer customer;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "orders")
     private List<OrderProduct> orderProductList;
 
     public void addOrderProduct(OrderProduct orderProduct)

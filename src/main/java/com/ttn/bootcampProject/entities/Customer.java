@@ -21,9 +21,8 @@ public class Customer extends User{
     private String contact;
     private String image;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_user_id")
-    private Set<Orders> ordersSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
+    private List<Orders> ordersSet;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<ProductReview> productReviews;
@@ -50,7 +49,7 @@ public class Customer extends User{
         {
             if(ordersSet == null)
             {
-                ordersSet = new HashSet<>();
+                ordersSet = new ArrayList<>();
             }
             ordersSet.add(orders);
         }

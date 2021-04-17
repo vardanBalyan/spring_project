@@ -25,4 +25,9 @@ public interface CartRepository extends CrudRepository<Cart, CartId> {
     @Modifying
     @Query("delete from Cart where cartId.customerUserId=:customerId AND cartId.productVariationId IN (:variationIds)")
     void deleteCustomerItemsFromCart(@Param("customerId") long customerId, @Param("variationIds") List<Long> variationIds);
+
+
+    @Query("select quantity from Cart where cartId.customerUserId=:customerId AND cartId.productVariationId=:variationId")
+    int getQuantityForCustomerIdAndVariationId(@Param("customerId") long customerId
+            , @Param("variationId") long variationId);
 }

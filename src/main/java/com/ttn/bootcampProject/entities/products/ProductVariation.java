@@ -32,8 +32,7 @@ public class ProductVariation {
     private String primaryImageName;
     private boolean isActive;
 
-    @OneToMany
-    @JoinColumn(name = "product_variation_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productVariation")
     private List<OrderProduct> orderProductList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productVariation")

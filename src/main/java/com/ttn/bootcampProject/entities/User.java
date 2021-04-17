@@ -34,8 +34,7 @@ public class User {
     private boolean isDeleted;
     private boolean isActive;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Address> addresses;
 
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")

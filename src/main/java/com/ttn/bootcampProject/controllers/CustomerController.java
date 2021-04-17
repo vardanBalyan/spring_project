@@ -2,10 +2,7 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Address;
-import com.ttn.bootcampProject.services.CartService;
-import com.ttn.bootcampProject.services.CategoryService;
-import com.ttn.bootcampProject.services.CustomerDaoService;
-import com.ttn.bootcampProject.services.ProductService;
+import com.ttn.bootcampProject.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +23,8 @@ public class CustomerController {
     ProductService productService;
     @Autowired
     CartService cartService;
+    @Autowired
+    OrderService orderService;
 
     @GetMapping("/profile")
     public CustomerProfileDto customerProfile(Principal principal) {
@@ -129,5 +128,11 @@ public class CustomerController {
     public ResponseEntity<String> emptyCart(Principal principal)
     {
         return cartService.emptyCart(principal.getName());
+    }
+
+    @PostMapping("/order-all-from-cart")
+    public ResponseEntity<String> orderFromCart(Principal principal)
+    {
+        return orderService.orderProductsFromCart(principal.getName());
     }
 }
