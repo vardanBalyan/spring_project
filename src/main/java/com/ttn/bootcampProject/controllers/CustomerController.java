@@ -135,4 +135,10 @@ public class CustomerController {
     {
         return orderService.orderProductsFromCart(principal.getName());
     }
+
+    @PostMapping("/partial-order-from-cart")
+    public ResponseEntity<String> partialOrderFromCart(@RequestParam List<Long> ids, Principal principal)
+    {
+        return orderService.orderPartialProductsFromCart(ids, principal.getName());
+    }
 }
