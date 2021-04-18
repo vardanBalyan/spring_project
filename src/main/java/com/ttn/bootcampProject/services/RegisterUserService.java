@@ -43,6 +43,9 @@ public class RegisterUserService {
         customer.setLastName(registerCustomer.getLastName());
         customer.setPassword(encoder.encode(registerCustomer.getPassword()));
         customer.setContact(registerCustomer.getContact());
+//        List<Address> addressList = new ArrayList<Address>();
+//        addressList.add(registerCustomer.getAddress());
+//        customer.setAddresses(addressList);
         customer.addAddress(registerCustomer.getAddress());
 
         // setting the role for the customer

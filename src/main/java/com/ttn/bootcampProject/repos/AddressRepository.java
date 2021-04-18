@@ -18,6 +18,6 @@ public interface AddressRepository extends CrudRepository<Address,Long> {
     @Query(value = "select id from address where user_id=:id",nativeQuery = true)
     List<Long> findAddressIdsForUserId(@Param("id") long id);
 
-    @Query("from Address where user.id=:userId AND label=:label")
+    @Query(value = "select * from address where user_id=:userId AND label=:label", nativeQuery = true)
     Address findAddressByUserIdAndLabel(@Param("userId") long userId, @Param("label") String label);
 }

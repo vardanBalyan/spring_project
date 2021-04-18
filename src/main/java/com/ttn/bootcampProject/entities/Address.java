@@ -19,8 +19,5 @@ public class Address {
     private String addressLine;
     private String zipCode;
     private String label;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
 }

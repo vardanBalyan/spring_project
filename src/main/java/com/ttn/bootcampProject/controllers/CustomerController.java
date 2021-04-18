@@ -4,6 +4,7 @@ import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -140,5 +141,28 @@ public class CustomerController {
     public ResponseEntity<String> partialOrderFromCart(@RequestParam List<Long> ids, Principal principal)
     {
         return orderService.orderPartialProductsFromCart(ids, principal.getName());
+    }
+
+    @PostMapping("/directly-order-product")
+    public ResponseEntity<String> directOrderProduct(@RequestParam Long productVariationId
+            , @RequestParam Integer quantity, Principal principal)
+    {
+        if(productVariationId == null)
+        {
+            return new ResponseEntity("Product variation id should not be null.", HttpStatus.BAD_REQUEST);
+        }
+
+        if(quantity == null)
+        {
+            return new ResponseEntity("Quantity should not be null.",HttpStatus.BAD_REQUEST);
+        }
+
+        return orderService.directOrderProduct(productVariationId, quantity, principal.getName());
+    }
+
+    @PatchMapping("/cancel-order")
+    public ResponseEntity<String> cancelOrder(@RequestParam long orderProductId, Principal principal)
+    {
+        return orderService.cancelOrder(principal.getName(), orderProductId);
     }
 }
