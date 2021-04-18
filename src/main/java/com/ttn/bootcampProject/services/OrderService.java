@@ -389,6 +389,45 @@ public class OrderService {
     }
 
 
+    public ResponseEntity<String> returnOrder(String email, long orderProductId)
+    {
+        // getting the customer from principle
+        User user = userRepository.findByEmail(email);
+        Customer customer = customerRepository.findCustomerById(user.getId());
+
+        OrderProduct orderProduct = orderProductRepository.findById(orderProductId);
+
+        if(orderProduct == null)
+        {
+            return new ResponseEntity("Invalid orderProduct id",HttpStatus.NOT_FOUND);
+        }
+
+        long orderIdForOrderProductId = orderProductRepository.getOrderIdForOrderProductId(orderProduct.getId());
+
+        Orders orders = ordersRepository.findById(orderIdForOrderProductId);
+
+        if(customer.getId() != orders.getCustomer().getId())
+        {
+            return new ResponseEntity("You don't have any product with specific orderProduct id."
+                    ,HttpStatus.NOT_FOUND);
+        }
+
+        OrderStatus orderStatus = orderStatusRepository.findById(orderProduct.getId());
+
+        if(!orderStatus.getToStatus().equals(DELIVERED))
+        {
+            return new ResponseEntity("Cannot place return request for order. Order is in "
+                    +orderStatus.getToStatus()+" state.",HttpStatus.BAD_REQUEST);
+        }
+
+        orderStatus.setFromStatus(orderStatus.getToStatus());
+        orderStatus.setToStatus(RETURN_REQUESTED);
+        orderStatus.setTransitionNotesComments("Return requested by customer.");
+
+        orderStatusRepository.save(orderStatus);
+        return new ResponseEntity("Return request placed successfully.",HttpStatus.ACCEPTED);
+    }
+
     // returns total amount for the order
     private double returnOrderTotalAmount(List<ProductVariation> productVariationList, long customerId)
     {

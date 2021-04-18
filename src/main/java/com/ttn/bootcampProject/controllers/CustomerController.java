@@ -165,4 +165,10 @@ public class CustomerController {
     {
         return orderService.cancelOrder(principal.getName(), orderProductId);
     }
+
+    @PatchMapping("/return-order")
+    public ResponseEntity<String> returnOrder(@RequestParam long orderProductId, Principal principal)
+    {
+        return orderService.returnOrder(principal.getName(), orderProductId);
+    }
 }
