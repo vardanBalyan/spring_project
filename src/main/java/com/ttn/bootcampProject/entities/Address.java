@@ -18,6 +18,7 @@ public class Address {
     private String country;
     private String addressLine;
     private String zipCode;
+    @Column(unique = true)
     private String label;
 
 }

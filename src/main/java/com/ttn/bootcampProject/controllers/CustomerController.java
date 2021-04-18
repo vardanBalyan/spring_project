@@ -171,4 +171,11 @@ public class CustomerController {
     {
         return orderService.returnOrder(principal.getName(), orderProductId);
     }
+
+
+    @GetMapping("/view-order/{id}")
+    public DisplayOrderDto viewOrder(@PathVariable long id, Principal principal)
+    {
+        return orderService.viewOrder(principal.getName(),id);
+    }
 }

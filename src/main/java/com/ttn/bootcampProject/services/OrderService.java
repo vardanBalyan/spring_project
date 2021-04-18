@@ -1,5 +1,7 @@
 package com.ttn.bootcampProject.services;
 
+import com.ttn.bootcampProject.dtos.DisplayOrderDto;
+import com.ttn.bootcampProject.dtos.OrderProductWithStatusDto;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.User;
@@ -7,7 +9,9 @@ import com.ttn.bootcampProject.entities.orders.Cart;
 import com.ttn.bootcampProject.entities.orders.OrderProduct;
 import com.ttn.bootcampProject.entities.orders.OrderStatus;
 import com.ttn.bootcampProject.entities.orders.Orders;
+import com.ttn.bootcampProject.entities.products.Product;
 import com.ttn.bootcampProject.entities.products.ProductVariation;
+import com.ttn.bootcampProject.exceptions.OrderNotFoundException;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,6 +47,8 @@ public class OrderService {
     CartService cartService;
     @Autowired
     OrderStatusRepository orderStatusRepository;
+    @Autowired
+    ProductRepository productRepository;
 
     @Transactional
     public ResponseEntity<String> orderProductsFromCart(String email)
@@ -426,6 +432,70 @@ public class OrderService {
 
         orderStatusRepository.save(orderStatus);
         return new ResponseEntity("Return request placed successfully.",HttpStatus.ACCEPTED);
+    }
+
+
+    public DisplayOrderDto viewOrder(String email, long orderId)
+    {
+        // getting the customer from principle
+        User user = userRepository.findByEmail(email);
+        Customer customer = customerRepository.findCustomerById(user.getId());
+
+        DisplayOrderDto displayOrderDto = new DisplayOrderDto();
+
+        Orders orders = ordersRepository.findById(orderId);
+
+        if (orders == null)
+        {
+            throw new OrderNotFoundException("Invalid Order id.");
+        }
+
+        if(customer.getId() != orders.getCustomer().getId())
+        {
+            throw new OrderNotFoundException("No order found in your order list with id: "+orderId);
+        }
+
+        displayOrderDto.setOrderId(orders.getId());
+        displayOrderDto.setCreationDate(orders.getDateCreated());
+        displayOrderDto.setPaymentMethod(orders.getPaymentMethod());
+        displayOrderDto.setTotalAmount(orders.getAmountPaid());
+
+        Address customerAddress = new Address();
+        customerAddress.setAddressLine(orders.getCustomerAddressAddressLine());
+        customerAddress.setCity(orders.getCustomerAddressCity());
+        customerAddress.setCountry(orders.getCustomerAddressCountry());
+        customerAddress.setLabel(orders.getCustomerAddressLabel());
+        customerAddress.setState(orders.getCustomerAddressState());
+        customerAddress.setZipCode(orders.getCustomerAddressZipCode());
+
+        displayOrderDto.setAddress(customerAddress);
+
+        List<OrderProductWithStatusDto> orderProductWithStatusDtoList = new ArrayList<>();
+
+        List<OrderProduct> orderProductList = orderProductRepository.findOrderProductForOrderId(orders.getId());
+
+        for (OrderProduct orderProduct: orderProductList) {
+
+            Product product = productRepository
+                    .findById(productVariationRepository
+                            .getProductIdForVariationId(orderProduct.getProductVariation()
+                                    .getId()));
+
+            OrderStatus orderStatus = orderStatusRepository.findById(orderProduct.getId());
+            OrderProductWithStatusDto orderProductWithStatusDto = new OrderProductWithStatusDto();
+
+            orderProductWithStatusDto.setStatus(orderStatus.getToStatus().toString());
+            orderProductWithStatusDto.setMetadata(orderProduct.getProductVariationMetadata());
+            orderProductWithStatusDto.setPrice(orderProduct.getPrice());
+            orderProductWithStatusDto.setQuantity(orderProduct.getQuantity());
+            orderProductWithStatusDto.setVariationId(orderProduct.getProductVariation().getId());
+            orderProductWithStatusDto.setName(product.getName());
+
+            orderProductWithStatusDtoList.add(orderProductWithStatusDto);
+        }
+
+        displayOrderDto.setProducts(orderProductWithStatusDtoList);
+        return displayOrderDto;
     }
 
     // returns total amount for the order
