@@ -178,4 +178,10 @@ public class CustomerController {
     {
         return orderService.viewOrder(principal.getName(),id);
     }
+
+    @GetMapping("/view-all-orders")
+    public List<DisplayOrderDto> viewAllOrders(Principal principal)
+    {
+        return orderService.viewAllOrderForCustomer(principal.getName());
+    }
 }

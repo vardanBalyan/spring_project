@@ -443,18 +443,22 @@ public class OrderService {
 
         DisplayOrderDto displayOrderDto = new DisplayOrderDto();
 
+        // getting order from order id
         Orders orders = ordersRepository.findById(orderId);
 
+        // checking for valid order id
         if (orders == null)
         {
             throw new OrderNotFoundException("Invalid Order id.");
         }
 
+        // checking if order belong to currently logged in customer
         if(customer.getId() != orders.getCustomer().getId())
         {
             throw new OrderNotFoundException("No order found in your order list with id: "+orderId);
         }
 
+        // setting dto values
         displayOrderDto.setOrderId(orders.getId());
         displayOrderDto.setCreationDate(orders.getDateCreated());
         displayOrderDto.setPaymentMethod(orders.getPaymentMethod());
@@ -470,17 +474,21 @@ public class OrderService {
 
         displayOrderDto.setAddress(customerAddress);
 
+        // list to be passed in displayOrderDto
         List<OrderProductWithStatusDto> orderProductWithStatusDtoList = new ArrayList<>();
 
+        // getting all order products for the order
         List<OrderProduct> orderProductList = orderProductRepository.findOrderProductForOrderId(orders.getId());
 
         for (OrderProduct orderProduct: orderProductList) {
 
+            // getting product variation for particular orderProduct
             Product product = productRepository
                     .findById(productVariationRepository
                             .getProductIdForVariationId(orderProduct.getProductVariation()
                                     .getId()));
 
+            // getting the status of particular order product
             OrderStatus orderStatus = orderStatusRepository.findById(orderProduct.getId());
             OrderProductWithStatusDto orderProductWithStatusDto = new OrderProductWithStatusDto();
 
@@ -491,12 +499,88 @@ public class OrderService {
             orderProductWithStatusDto.setVariationId(orderProduct.getProductVariation().getId());
             orderProductWithStatusDto.setName(product.getName());
 
+            // adding to the list of orderProductWithStatusDto that will be passed in displayOrderDto
             orderProductWithStatusDtoList.add(orderProductWithStatusDto);
         }
 
+        // setting the orderProductWithStatusDtoList to displayOrderDto
         displayOrderDto.setProducts(orderProductWithStatusDtoList);
         return displayOrderDto;
     }
+
+
+
+    public List<DisplayOrderDto> viewAllOrderForCustomer(String email)
+    {
+        // getting the customer from principle
+        User user = userRepository.findByEmail(email);
+        Customer customer = customerRepository.findCustomerById(user.getId());
+
+        List<DisplayOrderDto> displayOrderDtoList = new ArrayList<>();
+
+        // getting list of orders for the logged in customer
+        List<Orders> customerOrders = ordersRepository.findAllOrderForCustomerId(customer.getId());
+
+        for (Orders orders: customerOrders) {
+
+            DisplayOrderDto displayOrderDto = new DisplayOrderDto();
+
+            // setting dto values
+            displayOrderDto.setOrderId(orders.getId());
+            displayOrderDto.setCreationDate(orders.getDateCreated());
+            displayOrderDto.setPaymentMethod(orders.getPaymentMethod());
+            displayOrderDto.setTotalAmount(orders.getAmountPaid());
+
+            Address customerAddress = new Address();
+            customerAddress.setAddressLine(orders.getCustomerAddressAddressLine());
+            customerAddress.setCity(orders.getCustomerAddressCity());
+            customerAddress.setCountry(orders.getCustomerAddressCountry());
+            customerAddress.setLabel(orders.getCustomerAddressLabel());
+            customerAddress.setState(orders.getCustomerAddressState());
+            customerAddress.setZipCode(orders.getCustomerAddressZipCode());
+
+            displayOrderDto.setAddress(customerAddress);
+
+            // list to be passed in displayOrderDto
+            List<OrderProductWithStatusDto> orderProductWithStatusDtoList = new ArrayList<>();
+
+            // getting all order products for the order
+            List<OrderProduct> orderProductList = orderProductRepository.findOrderProductForOrderId(orders.getId());
+
+            for (OrderProduct orderProduct: orderProductList) {
+
+                // getting product variation for particular orderProduct
+                Product product = productRepository
+                        .findById(productVariationRepository
+                                .getProductIdForVariationId(orderProduct.getProductVariation()
+                                        .getId()));
+
+                // getting the status of particular order product
+                OrderStatus orderStatus = orderStatusRepository.findById(orderProduct.getId());
+                OrderProductWithStatusDto orderProductWithStatusDto = new OrderProductWithStatusDto();
+
+                orderProductWithStatusDto.setStatus(orderStatus.getToStatus().toString());
+                orderProductWithStatusDto.setMetadata(orderProduct.getProductVariationMetadata());
+                orderProductWithStatusDto.setPrice(orderProduct.getPrice());
+                orderProductWithStatusDto.setQuantity(orderProduct.getQuantity());
+                orderProductWithStatusDto.setVariationId(orderProduct.getProductVariation().getId());
+                orderProductWithStatusDto.setName(product.getName());
+
+                // adding to the list of orderProductWithStatusDto that will be passed in displayOrderDto
+                orderProductWithStatusDtoList.add(orderProductWithStatusDto);
+            }
+
+            // setting the orderProductWithStatusDtoList to displayOrderDto
+            displayOrderDto.setProducts(orderProductWithStatusDtoList);
+
+            // adding the displayOrderDto to list
+            displayOrderDtoList.add(displayOrderDto);
+        }
+
+        return displayOrderDtoList;
+    }
+
+
 
     // returns total amount for the order
     private double returnOrderTotalAmount(List<ProductVariation> productVariationList, long customerId)
