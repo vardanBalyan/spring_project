@@ -13,4 +13,7 @@ public interface OrdersRepository extends CrudRepository<Orders, Long> {
 
     @Query("from Orders where customer.id=:id")
     List<Orders> findAllOrderForCustomerId(@Param("id") long customerId);
+
+    @Query("from Orders")
+    List<Orders> findAllOrders();
 }

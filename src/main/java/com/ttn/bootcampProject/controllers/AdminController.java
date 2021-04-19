@@ -5,6 +5,7 @@ import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
+import com.ttn.bootcampProject.services.OrderService;
 import com.ttn.bootcampProject.services.ProductService;
 import com.ttn.bootcampProject.services.UserDaoService;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ public class AdminController {
     CategoryService categoryService;
     @Autowired
     ProductService productService;
+    @Autowired
+    OrderService orderService;
 
     @GetMapping(path = "/customers")
     public List<GetAllCustomerInfoDto> listAllCustomers()
@@ -151,5 +154,11 @@ public class AdminController {
     public List<ProductWithVariationImageDto> viewAllProduct()
     {
         return productService.viewAllProductForAdmin();
+    }
+
+    @GetMapping("/view-all-orders")
+    public List<DisplayOrderDto> viewALlOrders()
+    {
+        return orderService.viewAllOrderForAdmin();
     }
 }
