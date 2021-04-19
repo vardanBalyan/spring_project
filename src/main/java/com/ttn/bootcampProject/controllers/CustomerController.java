@@ -108,9 +108,9 @@ public class CustomerController {
     }
 
     @GetMapping("/view-cart")
-    public List<DisplayCartDto> viewCart(Principal principal)
+    public List<DisplayCartDto> viewCart(Principal principal, @RequestParam(required = false) Integer page)
     {
-        return cartService.viewCart(principal.getName());
+        return cartService.viewCart(principal.getName(), page);
     }
 
     @DeleteMapping("/delete-from-cart/{variationId}")
@@ -180,8 +180,8 @@ public class CustomerController {
     }
 
     @GetMapping("/view-all-orders")
-    public List<DisplayOrderDto> viewAllOrders(Principal principal)
+    public List<DisplayOrderDto> viewAllOrders(Principal principal, @RequestParam(required = false) Integer page)
     {
-        return orderService.viewAllOrderForCustomer(principal.getName());
+        return orderService.viewAllOrderForCustomer(principal.getName(), page);
     }
 }

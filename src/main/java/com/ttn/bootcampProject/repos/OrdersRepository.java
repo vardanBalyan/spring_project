@@ -13,11 +13,11 @@ public interface OrdersRepository extends CrudRepository<Orders, Long> {
     Orders findById(long id);
 
     @Query("from Orders where customer.id=:id")
-    List<Orders> findAllOrderForCustomerId(@Param("id") long customerId);
+    List<Orders> findAllOrderForCustomerId(@Param("id") long customerId, Pageable pageable);
 
     @Query("from Orders")
     List<Orders> findAllOrders(Pageable pageable);
 
     @Query("from Orders where id IN (:idList)")
-    List<Orders> findByIdIn(@Param("idList") List<Long> ids);
+    List<Orders> findByIdIn(@Param("idList") List<Long> ids, Pageable pageable);
 }

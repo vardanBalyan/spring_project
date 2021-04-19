@@ -15,6 +15,8 @@ import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.exceptions.OrderNotFoundException;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -517,8 +519,15 @@ public class OrderService {
 
 
 
-    public List<DisplayOrderDto> viewAllOrderForCustomer(String email)
+    public List<DisplayOrderDto> viewAllOrderForCustomer(String email, Integer page)
     {
+
+        if(page == null)
+        {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
+
         // getting the customer from principle
         User user = userRepository.findByEmail(email);
         Customer customer = customerRepository.findCustomerById(user.getId());
@@ -526,7 +535,7 @@ public class OrderService {
         List<DisplayOrderDto> displayOrderDtoList = new ArrayList<>();
 
         // getting list of orders for the logged in customer
-        List<Orders> customerOrders = ordersRepository.findAllOrderForCustomerId(customer.getId());
+        List<Orders> customerOrders = ordersRepository.findAllOrderForCustomerId(customer.getId(), pageable);
 
         for (Orders orders: customerOrders) {
 
@@ -584,7 +593,8 @@ public class OrderService {
             displayOrderDtoList.add(displayOrderDto);
         }
 
-        return displayOrderDtoList;
+        Page<DisplayOrderDto> displayOrderDtoPage = new PageImpl<>(displayOrderDtoList);
+        return displayOrderDtoPage.getContent();
     }
 
 
@@ -595,10 +605,10 @@ public class OrderService {
         {
             page = 0;
         }
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
 
         List<DisplayOrderDto> displayOrderDtoList = new ArrayList<>();
 
-        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
         // getting list of orders for the logged in customer
         List<Orders> customerOrders = ordersRepository.findAllOrders(pageable);
 
@@ -658,7 +668,8 @@ public class OrderService {
             displayOrderDtoList.add(displayOrderDto);
         }
 
-        return displayOrderDtoList;
+        Page<DisplayOrderDto> displayOrderDtoPage = new PageImpl<>(displayOrderDtoList);
+        return displayOrderDtoPage.getContent();
     }
 
 
@@ -683,8 +694,15 @@ public class OrderService {
         return new ResponseEntity("Status changed successfully.",HttpStatus.ACCEPTED);
     }
 
-    public List<DisplayOrderDto> viewAllOrderForSeller(String email)
+    public List<DisplayOrderDto> viewAllOrderForSeller(String email, Integer page)
     {
+
+        if(page == null)
+        {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
+
         // finding user by email getting from principal
         User user = userRepository.findByEmail(email);
         // finding the seller from user id we got from email
@@ -701,7 +719,7 @@ public class OrderService {
         List<Long> orderIds = orderProductRepository.getAllOrderIdForVariationIdsList(productVariationIds);
 
 
-        List<Orders> customerOrders = ordersRepository.findByIdIn(orderIds);
+        List<Orders> customerOrders = ordersRepository.findByIdIn(orderIds, pageable);
 
         for (Orders orders: customerOrders) {
 
@@ -759,7 +777,9 @@ public class OrderService {
             // adding the displayOrderDto to list
             displayOrderDtoList.add(displayOrderDto);
         }
-        return displayOrderDtoList;
+
+        Page<DisplayOrderDto> displayOrderDtoPage = new PageImpl<>(displayOrderDtoList);
+        return displayOrderDtoPage.getContent();
     }
 
 

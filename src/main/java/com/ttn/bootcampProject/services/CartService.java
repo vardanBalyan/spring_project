@@ -2,6 +2,7 @@ package com.ttn.bootcampProject.services;
 
 import com.ttn.bootcampProject.dtos.CartDto;
 import com.ttn.bootcampProject.dtos.DisplayCartDto;
+import com.ttn.bootcampProject.dtos.DisplayOrderDto;
 import com.ttn.bootcampProject.entities.Customer;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.orders.Cart;
@@ -10,6 +11,10 @@ import com.ttn.bootcampProject.entities.products.Product;
 import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -21,6 +26,7 @@ import java.util.List;
 @Repository
 public class CartService {
 
+    private static final int PAGE_SIZE = 5;
     @Autowired
     ProductVariationRepository productVariationRepository;
     @Autowired
@@ -117,15 +123,21 @@ public class CartService {
     }
 
 
-    public List<DisplayCartDto> viewCart(String email)
+    public List<DisplayCartDto> viewCart(String email, Integer page)
     {
+
+        if(page == null)
+        {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
         // getting the customer from principle
         User user = userRepository.findByEmail(email);
         Customer customer = customerRepository.findCustomerById(user.getId());
 
         List<DisplayCartDto> displayCartDtoList = new ArrayList<>();
 
-        List<Cart> allItems = cartRepository.getAllCartItemsForCustomerId(customer.getId());
+        List<Cart> allItems = cartRepository.getAllCartItemsForCustomerId(customer.getId(), pageable);
 
         for (Cart item: allItems) {
             ProductVariation productVariation = productVariationRepository
@@ -144,7 +156,8 @@ public class CartService {
             displayCartDtoList.add(displayCartDto);
         }
 
-        return displayCartDtoList;
+        Page<DisplayCartDto> displayCartDtoPage = new PageImpl<>(displayCartDtoList);
+        return displayCartDtoPage.getContent();
     }
 
 

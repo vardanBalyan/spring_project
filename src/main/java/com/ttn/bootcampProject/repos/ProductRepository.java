@@ -1,6 +1,7 @@
 package com.ttn.bootcampProject.repos;
 
 import com.ttn.bootcampProject.entities.products.Product;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +29,9 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     @Query(value = "select * from product where seller_user_id=:id AND is_deleted=false",nativeQuery = true)
     List<Product> getAllProductsOfSeller(@Param("id") long sellerId);
+
+    @Query(value = "select * from product where seller_user_id=:id AND is_deleted=false",nativeQuery = true)
+    List<Product> getAllProductsOfSeller(@Param("id") long sellerId, Pageable pageable);
 
     @Query("from Product where isDeleted=false AND is_active=true")
     List<Product> findAllNonDeletedAndActiveProducts();

@@ -10,6 +10,8 @@ import com.ttn.bootcampProject.services.OrderService;
 import com.ttn.bootcampProject.services.ProductService;
 import com.ttn.bootcampProject.services.SellerDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,9 +85,9 @@ public class SellerController {
     }
 
     @GetMapping("/product")
-    public List<DisplayProductDto> viewAllProducts(Principal principal)
+    public List<DisplayProductDto> viewAllProducts(Principal principal, @RequestParam(required = false) Integer page)
     {
-        return productService.viewALlProducts(principal.getName());
+        return productService.viewALlProducts(principal.getName(), page);
     }
 
     @DeleteMapping("/product/{id}")
@@ -113,9 +115,9 @@ public class SellerController {
     }
 
     @GetMapping("/product-variation")
-    public List<DisplayProductVariationDto> viewAllProductVariation(Principal principal)
+    public List<DisplayProductVariationDto> viewAllProductVariation(Principal principal, @RequestParam(required = false) Integer page)
     {
-        return productService.viewAllProductVariation(principal.getName());
+        return productService.viewAllProductVariation(principal.getName(), page);
     }
 
     @PatchMapping("/update-product-variation/{id}")
@@ -126,9 +128,9 @@ public class SellerController {
 
 
     @GetMapping("/view-all-orders")
-    public List<DisplayOrderDto> viewAllOrders(Principal principal)
+    public List<DisplayOrderDto> viewAllOrders(Principal principal, @RequestParam(required = false) Integer page)
     {
-        return orderService.viewAllOrderForSeller(principal.getName());
+        return orderService.viewAllOrderForSeller(principal.getName(), page);
     }
 
     @PatchMapping("/change-status-of-order")

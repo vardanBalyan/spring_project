@@ -11,6 +11,10 @@ import com.ttn.bootcampProject.exceptions.ProductNotFoundException;
 import com.ttn.bootcampProject.exceptions.ProductVariationNotFoundException;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -20,6 +24,7 @@ import java.util.*;
 @Repository
 public class ProductService {
 
+    private static final int PAGE_SIZE = 3;
     @Autowired
     SellerRepository sellerRepository;
     @Autowired
@@ -118,15 +123,22 @@ public class ProductService {
         return displayProductDto;
     }
 
-    public List<DisplayProductDto> viewALlProducts(String email)
+    public List<DisplayProductDto> viewALlProducts(String email, Integer page)
     {
+
+        if(page == null)
+        {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
+
         // finding user by email getting from principal
         User user = userRepository.findByEmail(email);
         // finding the seller from user id we got from email
         Seller seller = sellerRepository.findSellerByUserId(user.getId());
 
         // getting all products of seller
-        List<Product> allProductOfSeller = productRepository.getAllProductsOfSeller(seller.getId());
+        List<Product> allProductOfSeller = productRepository.getAllProductsOfSeller(seller.getId(), pageable);
 
         List<DisplayProductDto> displayProductDtoList = new ArrayList<>();
 
@@ -149,7 +161,8 @@ public class ProductService {
             displayProductDtoList.add(displayProductDto);
         }
 
-        return displayProductDtoList;
+        Page<DisplayProductDto> displayProductDtoPage = new PageImpl<>(displayProductDtoList);
+        return displayProductDtoPage.getContent();
     }
 
     public ResponseEntity<String> deleteAProduct(long id, String email)
@@ -344,8 +357,15 @@ public class ProductService {
         return displayProductVariationDto;
     }
 
-    public List<DisplayProductVariationDto> viewAllProductVariation(String email)
+    public List<DisplayProductVariationDto> viewAllProductVariation(String email, Integer page)
     {
+
+        if(page == null)
+        {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
+
         // finding user by email getting from principal
         User user = userRepository.findByEmail(email);
         // finding the seller from user id we got from email
@@ -359,7 +379,7 @@ public class ProductService {
 
             // getting all variations of product using product id
             List<ProductVariation> productVariations = productVariationRepository
-                    .getAllProductVariationForProductId(product.getId());
+                    .getAllProductVariationForProductId(product.getId(), pageable);
 
             for (ProductVariation productVariation: productVariations) {
 
@@ -392,7 +412,9 @@ public class ProductService {
             }
 
         }
-        return displayProductVariationDtoList;
+
+        Page<DisplayProductVariationDto> displayProductVariationDtoPage = new PageImpl<>(displayProductVariationDtoList);
+        return displayProductVariationDtoPage.getContent();
     }
 
 
