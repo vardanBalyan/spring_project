@@ -2,6 +2,8 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Address;
+import com.ttn.bootcampProject.entities.orders.OrderStatus;
+import com.ttn.bootcampProject.exceptions.EnumValueNotFoundException;
 import com.ttn.bootcampProject.exceptions.ProductNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.OrderService;
@@ -127,5 +129,19 @@ public class SellerController {
     public List<DisplayOrderDto> viewAllOrders(Principal principal)
     {
         return orderService.viewAllOrderForSeller(principal.getName());
+    }
+
+    @PatchMapping("/change-status-of-order")
+    public ResponseEntity<String> changeStatusOfOrder(@RequestParam long orderProductId
+            , @RequestParam String fromStatus, @RequestParam String toStatus, Principal principal)
+    {
+        try {
+            return orderService.changeOrderStatusForSeller(principal.getName(),orderProductId
+                    , OrderStatus.Status.valueOf(fromStatus)
+                    ,OrderStatus.Status.valueOf(toStatus));
+        }catch (IllegalArgumentException e)
+        {
+            throw new EnumValueNotFoundException(e.getMessage());
+        }
     }
  }

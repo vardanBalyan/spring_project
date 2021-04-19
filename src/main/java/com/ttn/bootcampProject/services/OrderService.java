@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -693,19 +694,11 @@ public class OrderService {
 
         List<Long> sellerProductIds = productRepository.getAllProductIdsForSellerId(seller.getId());
 
-        sellerProductIds.forEach(System.out::println);
-        System.out.println("//////////////////////////");
-
         List<Long> productVariationIds = productVariationRepository
                 .getAllVariationIdsForListOfProductId(sellerProductIds);
 
-        productVariationIds.forEach(System.out::println);
-        System.out.println("//////////////////////////");
 
         List<Long> orderIds = orderProductRepository.getAllOrderIdForVariationIdsList(productVariationIds);
-
-        orderIds.forEach(System.out::println);
-        System.out.println("//////////////////////////");
 
 
         List<Orders> customerOrders = ordersRepository.findByIdIn(orderIds);
@@ -732,8 +725,6 @@ public class OrderService {
 
             // list to be passed in displayOrderDto
             List<OrderProductWithStatusDto> orderProductWithStatusDtoList = new ArrayList<>();
-
-            System.out.println(">>>>>>>>>>>>>>>>/??????/////"+orders.getId());
 
             // getting all order products for the order
             List<OrderProduct> orderProductList = orderProductRepository
@@ -769,6 +760,173 @@ public class OrderService {
             displayOrderDtoList.add(displayOrderDto);
         }
         return displayOrderDtoList;
+    }
+
+
+    public ResponseEntity<String> changeOrderStatusForSeller(String email, long orderProductId
+            , OrderStatus.Status fromStatus, OrderStatus.Status toStatus)
+    {
+        // finding user by email getting from principal
+        User user = userRepository.findByEmail(email);
+        // finding the seller from user id we got from email
+        Seller seller = sellerRepository.findSellerByUserId(user.getId());
+
+        List<DisplayOrderDto> displayOrderDtoList = new ArrayList<>();
+
+        List<Long> sellerProductIds = productRepository.getAllProductIdsForSellerId(seller.getId());
+
+        List<Long> productVariationIds = productVariationRepository
+                .getAllVariationIdsForListOfProductId(sellerProductIds);
+
+        List<Long> orderProductsIds = orderProductRepository.getOrderProductIdsForVariationIdList(productVariationIds);
+
+        if(!orderProductsIds.contains(orderProductId))
+        {
+            return new ResponseEntity("You are not owner of this product.",HttpStatus.BAD_REQUEST);
+        }
+
+        if(!checkTransition(fromStatus,toStatus))
+        {
+            return new ResponseEntity("Invalid status transition",HttpStatus.BAD_REQUEST);
+        }
+
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>"+checkTransition(fromStatus,toStatus));
+
+        // getting the status of particular order product
+        OrderStatus orderStatus = orderStatusRepository.findById(orderProductId);
+
+        orderStatus.setFromStatus(fromStatus);
+        orderStatus.setToStatus(toStatus);
+
+        orderProductRepository.save(orderStatus);
+
+        return new ResponseEntity("Status changed successfully.",HttpStatus.ACCEPTED);
+    }
+
+
+    public boolean checkTransition(OrderStatus.Status fromStatus, OrderStatus.Status toStatus)
+    {
+        List<OrderStatus.Status> statusList;
+
+        if(fromStatus.equals(ORDER_PLACED))
+        {
+            statusList = Arrays.asList(CANCELLED,ORDER_CONFIRMED,ORDER_REJECTED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(CANCELLED))
+        {
+            statusList = Arrays.asList(REFUND_INITIATED,CLOSED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(ORDER_REJECTED))
+        {
+            statusList = Arrays.asList(REFUND_INITIATED,CLOSED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(ORDER_CONFIRMED))
+        {
+            statusList = Arrays.asList(ORDER_SHIPPED,CANCELLED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(ORDER_SHIPPED))
+        {
+            statusList = Arrays.asList(DELIVERED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(DELIVERED))
+        {
+            statusList = Arrays.asList(RETURN_REQUESTED,CLOSED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(RETURN_REQUESTED))
+        {
+            statusList = Arrays.asList(RETURN_REJECTED,RETURN_APPROVED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(RETURN_REJECTED))
+        {
+            statusList = Arrays.asList(CLOSED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(RETURN_APPROVED))
+        {
+            statusList = Arrays.asList(PICK_UP_INITIATED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(PICK_UP_INITIATED))
+        {
+            statusList = Arrays.asList(PICK_UP_COMPLETED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(PICK_UP_COMPLETED))
+        {
+            statusList = Arrays.asList(REFUND_INITIATED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(REFUND_INITIATED))
+        {
+            statusList = Arrays.asList(REFUND_COMPLETED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+        if(fromStatus.equals(REFUND_COMPLETED))
+        {
+            statusList = Arrays.asList(CLOSED);
+
+            if(statusList.contains(toStatus))
+                return true;
+
+        }
+
+
+        return false;
     }
 
     // returns total amount for the order
