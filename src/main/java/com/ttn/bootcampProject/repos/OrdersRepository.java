@@ -17,4 +17,7 @@ public interface OrdersRepository extends CrudRepository<Orders, Long> {
 
     @Query("from Orders")
     List<Orders> findAllOrders(Pageable pageable);
+
+    @Query("from Orders where id IN (:idList)")
+    List<Orders> findByIdIn(@Param("idList") List<Long> ids);
 }

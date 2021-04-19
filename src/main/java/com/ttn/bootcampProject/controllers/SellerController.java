@@ -4,6 +4,7 @@ import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.exceptions.ProductNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
+import com.ttn.bootcampProject.services.OrderService;
 import com.ttn.bootcampProject.services.ProductService;
 import com.ttn.bootcampProject.services.SellerDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class SellerController {
     CategoryService categoryService;
     @Autowired
     ProductService productService;
+    @Autowired
+    OrderService orderService;
 
     @GetMapping("/profile")
     public SellerProfileDto customerProfile(Principal principal) {
@@ -117,5 +120,12 @@ public class SellerController {
     public ResponseEntity<String> updateProduct(@RequestBody AddProductVariationDto addProductVariationDto, @PathVariable long id, Principal principal)
     {
         return productService.updateProductVariation(addProductVariationDto, principal.getName(), id);
+    }
+
+
+    @GetMapping("/view-all-orders")
+    public List<DisplayOrderDto> viewAllOrders(Principal principal)
+    {
+        return orderService.viewAllOrderForSeller(principal.getName());
     }
  }

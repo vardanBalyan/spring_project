@@ -4,6 +4,7 @@ import com.ttn.bootcampProject.dtos.DisplayOrderDto;
 import com.ttn.bootcampProject.dtos.OrderProductWithStatusDto;
 import com.ttn.bootcampProject.entities.Address;
 import com.ttn.bootcampProject.entities.Customer;
+import com.ttn.bootcampProject.entities.Seller;
 import com.ttn.bootcampProject.entities.User;
 import com.ttn.bootcampProject.entities.orders.Cart;
 import com.ttn.bootcampProject.entities.orders.OrderProduct;
@@ -21,11 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.prefs.BackingStoreException;
 
 import static com.ttn.bootcampProject.entities.orders.OrderStatus.Status.*;
 
@@ -52,6 +51,8 @@ public class OrderService {
     OrderStatusRepository orderStatusRepository;
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    SellerRepository sellerRepository;
 
     private int PAGE_SIZE = 5;
 
@@ -679,6 +680,95 @@ public class OrderService {
         orderProductRepository.save(orderStatus);
 
         return new ResponseEntity("Status changed successfully.",HttpStatus.ACCEPTED);
+    }
+
+    public List<DisplayOrderDto> viewAllOrderForSeller(String email)
+    {
+        // finding user by email getting from principal
+        User user = userRepository.findByEmail(email);
+        // finding the seller from user id we got from email
+        Seller seller = sellerRepository.findSellerByUserId(user.getId());
+
+        List<DisplayOrderDto> displayOrderDtoList = new ArrayList<>();
+
+        List<Long> sellerProductIds = productRepository.getAllProductIdsForSellerId(seller.getId());
+
+        sellerProductIds.forEach(System.out::println);
+        System.out.println("//////////////////////////");
+
+        List<Long> productVariationIds = productVariationRepository
+                .getAllVariationIdsForListOfProductId(sellerProductIds);
+
+        productVariationIds.forEach(System.out::println);
+        System.out.println("//////////////////////////");
+
+        List<Long> orderIds = orderProductRepository.getAllOrderIdForVariationIdsList(productVariationIds);
+
+        orderIds.forEach(System.out::println);
+        System.out.println("//////////////////////////");
+
+
+        List<Orders> customerOrders = ordersRepository.findByIdIn(orderIds);
+
+        for (Orders orders: customerOrders) {
+
+            DisplayOrderDto displayOrderDto = new DisplayOrderDto();
+
+            // setting dto values
+            displayOrderDto.setOrderId(orders.getId());
+            displayOrderDto.setCreationDate(orders.getDateCreated());
+            displayOrderDto.setPaymentMethod(orders.getPaymentMethod());
+            displayOrderDto.setTotalAmount(orders.getAmountPaid());
+
+            Address customerAddress = new Address();
+            customerAddress.setAddressLine(orders.getCustomerAddressAddressLine());
+            customerAddress.setCity(orders.getCustomerAddressCity());
+            customerAddress.setCountry(orders.getCustomerAddressCountry());
+            customerAddress.setLabel(orders.getCustomerAddressLabel());
+            customerAddress.setState(orders.getCustomerAddressState());
+            customerAddress.setZipCode(orders.getCustomerAddressZipCode());
+
+            displayOrderDto.setAddress(customerAddress);
+
+            // list to be passed in displayOrderDto
+            List<OrderProductWithStatusDto> orderProductWithStatusDtoList = new ArrayList<>();
+
+            System.out.println(">>>>>>>>>>>>>>>>/??????/////"+orders.getId());
+
+            // getting all order products for the order
+            List<OrderProduct> orderProductList = orderProductRepository
+                    .findByOrderIdAndVariationIdList(productVariationIds, orders.getId());
+
+            for (OrderProduct orderProduct: orderProductList) {
+
+                // getting product variation for particular orderProduct
+                Product product = productRepository
+                        .findById(productVariationRepository
+                                .getProductIdForVariationId(orderProduct.getProductVariation()
+                                        .getId()));
+
+                // getting the status of particular order product
+                OrderStatus orderStatus = orderStatusRepository.findById(orderProduct.getId());
+                OrderProductWithStatusDto orderProductWithStatusDto = new OrderProductWithStatusDto();
+
+                orderProductWithStatusDto.setStatus(orderStatus.getToStatus().toString());
+                orderProductWithStatusDto.setMetadata(orderProduct.getProductVariationMetadata());
+                orderProductWithStatusDto.setPrice(orderProduct.getPrice());
+                orderProductWithStatusDto.setQuantity(orderProduct.getQuantity());
+                orderProductWithStatusDto.setVariationId(orderProduct.getProductVariation().getId());
+                orderProductWithStatusDto.setName(product.getName());
+
+                // adding to the list of orderProductWithStatusDto that will be passed in displayOrderDto
+                orderProductWithStatusDtoList.add(orderProductWithStatusDto);
+            }
+
+            // setting the orderProductWithStatusDtoList to displayOrderDto
+            displayOrderDto.setProducts(orderProductWithStatusDtoList);
+
+            // adding the displayOrderDto to list
+            displayOrderDtoList.add(displayOrderDto);
+        }
+        return displayOrderDtoList;
     }
 
     // returns total amount for the order

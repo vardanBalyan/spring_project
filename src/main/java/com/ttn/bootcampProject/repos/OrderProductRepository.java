@@ -16,4 +16,10 @@ public interface OrderProductRepository extends CrudRepository<OrderProduct, Lon
 
     @Query("from OrderProduct where orders.id=:id")
     List<OrderProduct> findOrderProductForOrderId(@Param("id") long id);
+
+    @Query("from OrderProduct where productVariation.id IN (:idList) AND orders.id=:oid")
+    List<OrderProduct> findByOrderIdAndVariationIdList(@Param("idList") List<Long> variationIdList, @Param("oid") long id);
+
+    @Query(value = "select DISTINCT order_id from order_product where product_variation_id IN (:idList)",nativeQuery = true)
+    List<Long> getAllOrderIdForVariationIdsList(@Param("idList") List<Long> variationIdList);
 }

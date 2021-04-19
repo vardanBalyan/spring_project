@@ -22,4 +22,7 @@ public interface ProductVariationRepository extends CrudRepository<ProductVariat
 
     @Query("from ProductVariation where id IN (:variationIds)")
     List<ProductVariation> getAllProductVariationByIdsList(@Param("variationIds") List<Long> variationIds);
+
+    @Query(value = "select id from product_variation where product_id IN (:idList)", nativeQuery = true)
+    List<Long> getAllVariationIdsForListOfProductId(@Param("idList") List<Long> productIdList);
 }
