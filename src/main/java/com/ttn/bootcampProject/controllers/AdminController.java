@@ -2,8 +2,11 @@ package com.ttn.bootcampProject.controllers;
 
 import com.ttn.bootcampProject.dtos.*;
 import com.ttn.bootcampProject.entities.User;
+import com.ttn.bootcampProject.entities.orders.OrderStatus;
 import com.ttn.bootcampProject.entities.products.categories.CategoryMetadataField;
 import com.ttn.bootcampProject.exceptions.CategoryNotFoundException;
+import com.ttn.bootcampProject.exceptions.EnumValueNotFoundException;
+import com.ttn.bootcampProject.exceptions.OrderNotFoundException;
 import com.ttn.bootcampProject.services.CategoryService;
 import com.ttn.bootcampProject.services.OrderService;
 import com.ttn.bootcampProject.services.ProductService;
@@ -11,6 +14,7 @@ import com.ttn.bootcampProject.services.UserDaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -157,8 +161,22 @@ public class AdminController {
     }
 
     @GetMapping("/view-all-orders")
-    public List<DisplayOrderDto> viewALlOrders()
+    public List<DisplayOrderDto> viewALlOrders(@RequestParam(required = false) Integer page)
     {
-        return orderService.viewAllOrderForAdmin();
+        return orderService.viewAllOrderForAdmin(page);
+    }
+
+
+    @PatchMapping("/change-status-of-order")
+    public ResponseEntity<String> changeStatusOfOrder(@RequestParam long orderProductId
+            , @RequestParam String fromStatus, @RequestParam String toStatus)
+    {
+        try {
+            return orderService.changeStatusOfOrderForAdmin(OrderStatus.Status.valueOf(fromStatus)
+                    ,OrderStatus.Status.valueOf(toStatus),orderProductId);
+        }catch (IllegalArgumentException e)
+        {
+            throw new EnumValueNotFoundException(e.getMessage());
+        }
     }
 }

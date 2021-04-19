@@ -14,11 +14,14 @@ import com.ttn.bootcampProject.entities.products.ProductVariation;
 import com.ttn.bootcampProject.exceptions.OrderNotFoundException;
 import com.ttn.bootcampProject.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +52,8 @@ public class OrderService {
     OrderStatusRepository orderStatusRepository;
     @Autowired
     ProductRepository productRepository;
+
+    private int PAGE_SIZE = 5;
 
     @Transactional
     public ResponseEntity<String> orderProductsFromCart(String email)
@@ -581,13 +586,19 @@ public class OrderService {
     }
 
 
-    public List<DisplayOrderDto> viewAllOrderForAdmin()
+    public List<DisplayOrderDto> viewAllOrderForAdmin(Integer page)
     {
+
+        if(page == null)
+        {
+            page = 0;
+        }
 
         List<DisplayOrderDto> displayOrderDtoList = new ArrayList<>();
 
+        PageRequest pageable = PageRequest.of(page,PAGE_SIZE, Sort.Direction.ASC,"id");
         // getting list of orders for the logged in customer
-        List<Orders> customerOrders = ordersRepository.findAllOrders();
+        List<Orders> customerOrders = ordersRepository.findAllOrders(pageable);
 
         for (Orders orders: customerOrders) {
 
@@ -646,6 +657,28 @@ public class OrderService {
         }
 
         return displayOrderDtoList;
+    }
+
+
+    public ResponseEntity<String> changeStatusOfOrderForAdmin(OrderStatus.Status fromStatus, OrderStatus.Status toStatus
+            , long orderProductId)
+    {
+        OrderProduct orderProduct = orderProductRepository.findById(orderProductId);
+
+        if(orderProduct == null)
+        {
+            return new ResponseEntity("Invalid orderProduct id",HttpStatus.NOT_FOUND);
+        }
+
+        // getting the status of particular order product
+        OrderStatus orderStatus = orderStatusRepository.findById(orderProduct.getId());
+
+        orderStatus.setFromStatus(fromStatus);
+        orderStatus.setToStatus(toStatus);
+
+        orderProductRepository.save(orderStatus);
+
+        return new ResponseEntity("Status changed successfully.",HttpStatus.ACCEPTED);
     }
 
     // returns total amount for the order

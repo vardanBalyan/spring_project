@@ -1,6 +1,7 @@
 package com.ttn.bootcampProject.repos;
 
 import com.ttn.bootcampProject.entities.orders.Orders;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,5 +16,5 @@ public interface OrdersRepository extends CrudRepository<Orders, Long> {
     List<Orders> findAllOrderForCustomerId(@Param("id") long customerId);
 
     @Query("from Orders")
-    List<Orders> findAllOrders();
+    List<Orders> findAllOrders(Pageable pageable);
 }
