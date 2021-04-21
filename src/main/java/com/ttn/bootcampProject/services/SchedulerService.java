@@ -37,7 +37,7 @@ public class SchedulerService {
     @Autowired
     OrderStatusRepository orderStatusRepository;
 
-    @Scheduled(cron = "0 14 13 * * ?") // cron pattern : second, minute, hour, day, month, weekday
+    @Scheduled(cron = "0 41 15 * * ?") // cron pattern : second, minute, hour, day, month, weekday
     public void sendScheduledMail()
     {
 
@@ -77,6 +77,7 @@ public class SchedulerService {
                         sellerRejectedOrderDto.setOrderId(orders.getId());
                         sellerRejectedOrderDto.setVariationId(orderProduct.getProductVariation().getId());
                         sellerRejectedOrderDto.setProductName(product.getName());
+                        sellerRejectedOrderDto.setOrderProductId(orderProduct.getId());
 
                         sellerRejectedOrderDtoList.add(sellerRejectedOrderDto);
                     }
@@ -84,12 +85,25 @@ public class SchedulerService {
             }
 
 
+            StringBuilder rejectedOrderMsg = new StringBuilder();
+            int counter = 1;
+            for (SellerRejectedOrderDto sellerRejectedOrderDto: sellerRejectedOrderDtoList) {
+
+                rejectedOrderMsg.append("Sno. "+counter+"\n")
+                        .append("Order Id: "+sellerRejectedOrderDto.getOrderId()+"\n")
+                        .append("Order product Id: "+sellerRejectedOrderDto.getOrderProductId()+"\n")
+                        .append("Variation Id: "+sellerRejectedOrderDto.getVariationId()+"\n")
+                        .append("Product Name: "+sellerRejectedOrderDto.getProductName()+"\n")
+                        .append("\n");
+
+                counter++;
+            }
+
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(seller.getEmail());
-            mailMessage.setSubject("Rejected Orders");
+            mailMessage.setSubject("Rejected Orders\n");
             mailMessage.setFrom("vardanbalyan97@gmail.com");
-            mailMessage.setText("To confirm your account, please click here : "
-                    +"http://localhost:8080/confirm-account?token=");
+            mailMessage.setText("Rejected orders : \n"+rejectedOrderMsg);
 
             sellerRejectedOrderDtoList.clear();
             mailService.sendRegisterMail(mailMessage);
